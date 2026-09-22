@@ -13,7 +13,7 @@
 //   8. Navigate to /bill/:id  (Peak-End: end on the answer)
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, Uint8List;
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -61,8 +61,11 @@ class _BillCaptureScreenState extends State<BillCaptureScreen> {
       if (file != null) {
         setState(() { _pickedFile = file; _error = null; });
       }
+      // If file == null the user simply cancelled the picker — no error.
     } catch (e) {
-      setState(() => _error = 'Could not open file. Please try again.');
+      setState(() =>
+          _error = 'Could not open the picker on this device. '
+              'Try "Enter manually" instead.');
     }
   }
 
@@ -265,7 +268,10 @@ class _BillCaptureScreenState extends State<BillCaptureScreen> {
               if (_status != null)
                 Text(_status!, style: text.bodyMedium),
               if (_error != null)
-                Text(_error!, style: text.bodyMedium),
+                Text(
+                  _error!,
+                  style: text.bodyMedium?.copyWith(color: colours.error),
+                ),
 
               const Spacer(),
 
@@ -301,14 +307,28 @@ class _BillCaptureScreenState extends State<BillCaptureScreen> {
   }
 
   Widget _buildPreview(ColorScheme colours) {
+    // Use in-memory bytes so the preview works on every platform (web blob
+    // URLs are unreliable with Image.network).
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppTokens.radiusLg),
-      child: Image.network(
-        _pickedFile!.path,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Center(
-          child: Icon(Icons.image, size: 64, color: colours.onSurfaceVariant),
-        ),
+      child: FutureBuilder<Uint8List>(
+        future: _pickedFile!.readAsBytes(),
+        builder: (context, snap) {
+          if (!snap.hasData) {
+            return Center(
+              child: CircularProgressIndicator(color: colours.primary),
+            );
+          }
+          return Image.memory(
+            snap.data!,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            errorBuilder: (_, __, ___) => Center(
+              child: Icon(Icons.image,
+                  size: 64, color: colours.onSurfaceVariant),
+            ),
+          );
+        },
       ),
     );
   }
@@ -327,10 +347,10 @@ class _BillCaptureScreenState extends State<BillCaptureScreen> {
           ),
           const SizedBox(height: AppTokens.space3),
           Text(
-            widget.mode == 'camera' ? 'Tap to take a photo' : 'Tap to choose a file',
+            widget.mode == 'camera' ? 'Tap to take a photo' : 'Tap to choose an image',
             style: text.bodyMedium,
           ),
-          Text('JPG, PNG, or PDF', style: text.bodySmall),
+          Text('JPG or PNG', style: text.bodySmall),
         ],
       ),
     );

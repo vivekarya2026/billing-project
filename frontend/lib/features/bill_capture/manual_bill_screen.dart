@@ -114,7 +114,8 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
       }
 
       final name   = _name.text.trim();
-      final amount = double.parse(_amount.text.trim());
+      final amount = double.parse(
+          _amount.text.trim().replaceAll(RegExp(r'[^0-9.]'), ''));
       // Derive a service type from the auto-detected category keyword so the
       // bill card shows a matching icon later.
       final serviceType = _serviceTypeFor(name);

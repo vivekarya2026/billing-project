@@ -50,7 +50,7 @@ class AddBillScreen extends StatelessWidget {
               _ChoiceCard(
                 icon: Icons.add_a_photo_outlined,
                 title: 'Scan or upload',
-                subtitle: 'Take a photo or pick a file. We read the numbers.',
+                subtitle: 'Take a photo or pick an image. We read the numbers.',
                 onTap: () => context.push('/capture?mode=files'),
               ),
               const SizedBox(height: AppTokens.space4),

@@ -57,6 +57,10 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
   // Fetch /analyse drivers lazily when register is explained or full
   Future<List<SpendDriver>> _fetchDrivers(BillDetail bill) async {
     if (bill.amountDue == null) return [];
+    // Offline/demo mode has no AI service — never hit the network (it would
+    // block on a long timeout trying to reach localhost:8000). Return empty.
+    final repo = context.read<BillRepository>();
+    if (repo is FakeBillRepository) return [];
     try {
       final currentMap = _billToMap(bill);
       final result = await AiServiceClient.instance.analyse(
