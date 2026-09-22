@@ -41,11 +41,30 @@ class _HomeScreenState extends State<HomeScreen> {
   /// The bills currently held in the list (mutable for optimistic delete).
   List<Bill> _bills = [];
   String _selectedType = kAllBillTypes;
+  BillRepository? _repo;
 
   @override
   void initState() {
     super.initState();
     _load();
+    // Reload when the shared bill set changes (create/update/delete), so the
+    // list refreshes even though the shell keeps this screen alive.
+    _repo = context.read<BillRepository>();
+    if (_repo is FakeBillRepository) {
+      FakeBillRepository.revision.addListener(_onRevision);
+    }
+  }
+
+  void _onRevision() {
+    if (mounted) _reload();
+  }
+
+  @override
+  void dispose() {
+    if (_repo is FakeBillRepository) {
+      FakeBillRepository.revision.removeListener(_onRevision);
+    }
+    super.dispose();
   }
 
   void _load() {

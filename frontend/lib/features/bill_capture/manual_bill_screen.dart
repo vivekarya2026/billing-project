@@ -135,7 +135,24 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
           'amount_due':   amount,
           'due_date':     dueIso,
         });
-        if (mounted) context.go('/bill/${widget.billId}');
+        // Return to the Bills list (never a dead-end); offer a tap-through to
+        // the updated detail.
+        if (mounted) {
+          context.go('/bills');
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.clearSnackBars();
+          messenger.showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+              content: Text('Updated $name.'),
+              action: SnackBarAction(
+                label: 'View',
+                onPressed: () => context.push('/bill/${widget.billId}'),
+              ),
+            ),
+          );
+        }
         return;
       }
 
@@ -157,7 +174,25 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
           : 'Added manually.';
       await repo.updateBillNarration(billId, narration);
 
-      if (mounted) context.go('/bill/$billId');
+      // UX: creating a bill returns the user to the Bills list (home), where
+      // the new row is now visible — not a dead-end detail screen. A brief
+      // confirmation with a tap-through keeps the answer one tap away.
+      if (mounted) {
+        context.go('/bills');
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        messenger.showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            content: Text('Added $name.'),
+            action: SnackBarAction(
+              label: 'View',
+              onPressed: () => context.push('/bill/$billId'),
+            ),
+          ),
+        );
+      }
     } catch (e) {
       setState(() {
         _saving = false;

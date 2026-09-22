@@ -7,6 +7,7 @@
 // Switch: in main.dart, set useReal=false to use this.
 
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import '../models/bill.dart';
 import '../models/property.dart';
 import '../models/account.dart';
@@ -20,6 +21,12 @@ class FakeBillRepository implements BillRepository {
   // for the offline demo. Newest first.
   static final List<Bill> _userBills = [];
   static final Map<String, String> _narrationOverrides = {};
+
+  /// Bumped whenever the bill set changes (create / update / delete / restore)
+  /// so live screens (e.g. the Bills list) can reload themselves even while
+  /// kept alive by the shell's IndexedStack.
+  static final ValueNotifier<int> revision = ValueNotifier<int>(0);
+  static void _bump() => revision.value++;
 
   // Soft-delete + edit overrides (M15). Deleted ids are filtered out of every
   // read so the Bills list can offer an Undo (re-add by clearing the id).
@@ -511,6 +518,7 @@ class FakeBillRepository implements BillRepository {
       extractionStatus: (data['extraction_status'] as String?) ?? 'done',
       narrationSentence: data['narration_sentence'] as String?,
     ));
+    _bump();
     return {'id': id, ...data};
   }
 
@@ -531,16 +539,19 @@ class FakeBillRepository implements BillRepository {
     // Merge into existing overrides so successive edits accumulate.
     final existing = _edits[billId] ?? <String, dynamic>{};
     _edits[billId] = {...existing, ...changes};
+    _bump();
   }
 
   @override
   Future<void> deleteBill(String billId) async {
     _deletedIds.add(billId);
+    _bump();
   }
 
   /// Restore a soft-deleted bill (used by the list/detail Undo affordance).
   static void restoreBill(String billId) {
     _deletedIds.remove(billId);
+    _bump();
   }
 
   @override

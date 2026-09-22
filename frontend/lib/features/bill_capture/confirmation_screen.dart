@@ -138,10 +138,24 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
       }
       await repo.updateBillNarration(widget.billId, narration);
 
-      // 4. Navigate to the answer screen (Peak-End)
+      // 4. Return to the Bills list (Peak-End on the list where the new bill
+      //    is visible; never a dead-end detail screen). Offer a tap-through.
       if (mounted) {
-        Navigator.of(context).pop();
-        context.go('/bill/${widget.billId}');
+        Navigator.of(context).pop(); // close the confirmation route
+        context.go('/bills');
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        messenger.showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            content: const Text('Bill added.'),
+            action: SnackBarAction(
+              label: 'View',
+              onPressed: () => context.push('/bill/${widget.billId}'),
+            ),
+          ),
+        );
       }
     } catch (e) {
       setState(() => _saving = false);
