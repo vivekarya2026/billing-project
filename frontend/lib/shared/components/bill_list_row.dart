@@ -1,8 +1,8 @@
-// bill_list_row.dart — compact SplitWise-style row for a bill.
+// bill_list_row.dart — compact bill row (daisyUI list-row).
 // ------------------------------------------------------------
-// Layout mirrors the reference activity list:
-//   [ month ]   [ colored ]   Provider name            status label
-//   [  day  ]   [  tile   ]   subtitle (narration)          $amount
+// Layout:
+//   [ month ]   [ colored ]   Provider name              $amount
+//   [  day  ]   [  tile   ]   subtitle (narration)      status label
 //
 // The colored category tile (CategoryTile) is shared with expense rows so
 // bills and expenses read identically.
@@ -23,6 +23,7 @@ class BillListRow extends StatelessWidget {
     required this.onTap,
     this.serviceType,
     this.isOverdue = false,
+    this.isPaid = false,
   });
 
   final String provider;
@@ -32,29 +33,34 @@ class BillListRow extends StatelessWidget {
   final VoidCallback onTap;
   final String? serviceType;
   final bool isOverdue;
+  final bool isPaid;
 
   @override
   Widget build(BuildContext context) {
     final text    = Theme.of(context).textTheme;
     final colours = Theme.of(context).colorScheme;
 
-    // Right-hand status label mirrors the reference ("you borrowed" etc.).
     final statusLabel = _statusLabel();
-    final statusColor = isOverdue ? AppAccents.danger : colours.onSurfaceVariant;
+    final statusColor = isOverdue
+        ? AppAccents.danger
+        : (isPaid ? AppAccents.success : colours.onSurfaceVariant);
 
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppTokens.radiusBox),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTokens.space2,
+            vertical: AppTokens.space4, // more breathing room
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // ── Date (month over day) ────────────────────────────────
               SizedBox(
-                width: 30,
+                width: 36,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -65,27 +71,26 @@ class BillListRow extends StatelessWidget {
                       maxLines: 1,
                       softWrap: false,
                       overflow: TextOverflow.visible,
-                      style: text.bodySmall?.copyWith(
+                      style: text.labelSmall?.copyWith(
                         color: colours.onSurfaceVariant,
-                        fontSize: 11,
                       ),
                     ),
                     Text(
                       dueDate != null ? DateFormat('d').format(dueDate!) : '',
-                      style: text.titleMedium?.copyWith(
+                      style: text.titleLarge?.copyWith(
                         color: colours.onSurface,
                         fontWeight: FontWeight.w600,
-                        height: 1.1,
+                        height: 1.15,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppTokens.space3),
 
               // ── Colored category tile ────────────────────────────────
               CategoryTile(text: provider, serviceType: serviceType),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTokens.space3),
 
               // ── Provider + subtitle ──────────────────────────────────
               Expanded(
@@ -95,13 +100,13 @@ class BillListRow extends StatelessWidget {
                   children: [
                     Text(
                       provider,
-                      style: text.titleMedium?.copyWith(
+                      style: text.titleLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       interpretation,
                       style: text.bodySmall?.copyWith(
@@ -113,42 +118,41 @@ class BillListRow extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTokens.space3),
 
-              // ── Status label + amount ────────────────────────────────
+              // ── Amount + status label (amount leads) ─────────────────
               ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 96),
+                constraints: const BoxConstraints(maxWidth: 132),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (statusLabel != null)
+                    Text(
+                      _fmtAmount(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: text.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: isOverdue
+                            ? AppAccents.danger
+                            : colours.onSurface,
+                      ),
+                    ),
+                    if (statusLabel != null) ...[
+                      const SizedBox(height: 3),
                       Text(
                         statusLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.end,
-                        style: text.bodySmall?.copyWith(
+                        style: text.labelSmall?.copyWith(
                           color: statusColor,
-                          fontSize: 10.5,
+                          fontWeight:
+                              isOverdue ? FontWeight.w600 : FontWeight.normal,
                         ),
                       ),
-                    const SizedBox(height: 2),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        _fmtAmount(),
-                        maxLines: 1,
-                        style: text.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontSize: AppTokens.textTitle3,
-                          color: isOverdue
-                              ? AppAccents.danger
-                              : colours.onSurface,
-                        ),
-                      ),
-                    ),
+                    ],
                   ],
                 ),
               ),
@@ -165,14 +169,15 @@ class BillListRow extends StatelessWidget {
   }
 
   String? _statusLabel() {
+    if (isPaid) return 'Paid';
     if (dueDate == null) return null;
     final now  = DateTime.now();
     final diff = dueDate!
         .difference(DateTime(now.year, now.month, now.day))
         .inDays;
-    if (diff < 0)  return 'overdue by ${-diff} day${-diff == 1 ? '' : 's'}';
-    if (diff == 0) return 'due today';
-    if (diff == 1) return 'due tomorrow';
-    return 'due in $diff days';
+    if (diff < 0)  return '${-diff}d overdue';
+    if (diff == 0) return 'Due today';
+    if (diff == 1) return 'Due tomorrow';
+    return 'Due in ${diff}d';
   }
 }

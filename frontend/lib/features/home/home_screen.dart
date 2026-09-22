@@ -240,7 +240,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   delegate: SliverChildBuilderDelegate(
                     (context, i) {
                       final b = visible[i];
-                      final overdue = b.dueDate != null &&
+                      final overdue = !b.isPaid &&
+                          b.dueDate != null &&
                           b.dueDate!.isBefore(DateTime.now());
 
                       // Month grouping: show a month header whenever the month
@@ -281,6 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               amount:         b.amountDue,
                               dueDate:        b.dueDate,
                               isOverdue:      overdue,
+                              isPaid:         b.isPaid,
                               interpretation: b.narrationSentence ??
                                   'Tap to see details.',
                               onTap: () => context.push('/bill/${b.id}'),
@@ -348,7 +350,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _statusLine(List<Bill> bills) {
     final now = DateTime.now();
-    final overdue = bills.where((b) =>
+    final overdue = bills.where((b) => !b.isPaid &&
         b.dueDate != null && b.dueDate!.isBefore(now)).toList();
     if (overdue.isNotEmpty) {
       final n = overdue.length;
@@ -356,7 +358,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final soon = bills.where((b) {
-      if (b.dueDate == null) return false;
+      if (b.isPaid || b.dueDate == null) return false;
       final diff = b.dueDate!
           .difference(DateTime(now.year, now.month, now.day)).inDays;
       return diff >= 0 && diff <= 5;

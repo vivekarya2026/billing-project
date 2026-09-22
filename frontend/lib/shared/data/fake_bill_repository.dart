@@ -154,29 +154,47 @@ class FakeBillRepository implements BillRepository {
       _SeedService(_streamingAccount, 'Netflix',           'streaming', _streamingByMonth, '0006',  7, 'streaming'),
     ];
 
-    // Month index 0 = 11 months ago … 11 = last month.
+    // Month index 0 = 11 months ago … 11 = the CURRENT cycle.
+    // The newest cycle (i == 11) is dated a few days in the FUTURE so it reads
+    // as "due in N days" (upcoming), not overdue. Older cycles are historical
+    // records and are flagged as already paid (no overdue alarm).
     for (var i = 0; i < 12; i++) {
       final monthsAgo = 11 - i; // 11 … 0
-      final periodEndMonth =
-          DateTime(anchorMonth.year, anchorMonth.month - 1 - monthsAgo, 1);
-      final year = periodEndMonth.year;
-      final month = periodEndMonth.month;
-      final periodEnd = DateTime(year, month, 26);
-      final periodStart = DateTime(year, month, 1)
-          .subtract(const Duration(days: 5)); // ~prev month end
+      final isCurrent = i == 11;
+
+      final DateTime periodEnd;
+      final DateTime dueBase;
+      if (isCurrent) {
+        // Current cycle ends now; due dates land a bit in the future.
+        periodEnd = DateTime(now.year, now.month, now.day);
+        dueBase = DateTime(now.year, now.month, now.day);
+      } else {
+        final periodEndMonth =
+            DateTime(anchorMonth.year, anchorMonth.month - monthsAgo, 1);
+        periodEnd = DateTime(periodEndMonth.year, periodEndMonth.month, 26);
+        dueBase = periodEnd;
+      }
+      final periodStart = DateTime(periodEnd.year, periodEnd.month, 1)
+          .subtract(const Duration(days: 5));
       final seq = (i + 1).toString().padLeft(2, '0');
 
       for (final s in services) {
+        // Current cycle: due a few days out (offset % 10 + 2 days ahead).
+        // Historical cycles: due in the past but marked paid.
+        final due = isCurrent
+            ? dueBase.add(Duration(days: (s.dueOffset % 10) + 2))
+            : dueBase.add(Duration(days: s.dueOffset));
         bills.add(Bill(
           id: 'b0000000-0000-0000-${s.idSeg}-0000000000$seq',
           accountId: s.account,
           provider: s.provider,
           serviceType: s.serviceType,
           amountDue: s.series[i],
-          dueDate: periodEnd.add(Duration(days: s.dueOffset)),
+          dueDate: due,
           periodStart: periodStart,
           periodEnd: periodEnd,
           extractionStatus: 'done',
+          isPaid: !isCurrent,
           narrationSentence: _narration(i, s.series, s.noun),
         ));
       }
@@ -389,6 +407,7 @@ class FakeBillRepository implements BillRepository {
       extractionStatus: b.extractionStatus,
       narrationSentence:
           (e['narration_sentence'] as String?) ?? b.narrationSentence,
+      isPaid: b.isPaid,
     );
   }
 

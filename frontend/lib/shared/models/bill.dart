@@ -20,6 +20,9 @@ class Bill {
     // The one sentence produced by /narrate (or anomaly description).
     // Stored in bills.narration_sentence after extraction completes.
     this.narrationSentence,
+    // True once the bill has been paid/settled (historical cycles). Paid bills
+    // never show an "overdue" alarm even when the due date is in the past.
+    this.isPaid = false,
   });
 
   final String id;
@@ -32,6 +35,7 @@ class Bill {
   final DateTime? periodEnd;
   final String extractionStatus;
   final String? narrationSentence;
+  final bool isPaid;
 
   factory Bill.fromJson(Map<String, dynamic> j) {
     // accounts is an embedded join object
@@ -53,6 +57,7 @@ class Bill {
           : null,
       extractionStatus: j['extraction_status'] as String? ?? 'pending',
       narrationSentence: j['narration_sentence'] as String?,
+      isPaid:          j['is_paid'] as bool? ?? j['paid'] as bool? ?? false,
     );
   }
 }
@@ -69,6 +74,7 @@ class BillDetail extends Bill {
     super.periodEnd,
     required super.extractionStatus,
     super.narrationSentence,
+    super.isPaid,
     this.rawImagePath,
     required this.extractionFields,
     required this.lineItems,
