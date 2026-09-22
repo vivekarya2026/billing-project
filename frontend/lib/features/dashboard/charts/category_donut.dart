@@ -58,6 +58,7 @@ class CategoryDonut extends StatelessWidget {
         for (var i = 0; i < categories.length; i++) ...[
           if (i > 0) const SizedBox(height: AppTokens.space3),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: 12,
@@ -68,21 +69,41 @@ class CategoryDonut extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppTokens.space2),
+              // Label — flexible, allowed to wrap up to 2 lines then ellipsis,
+              // so it never collapses to one-character-per-line.
               Expanded(
-                child: Text(categories[i].category, style: text.bodyMedium),
+                child: Text(
+                  categories[i].category,
+                  style: text.bodyMedium,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                ),
               ),
               const SizedBox(width: AppTokens.space2),
-              Text(
-                currency.format(categories[i].total),
-                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(width: AppTokens.space2),
-              Text(
-                total == 0
-                    ? ''
-                    : '${((categories[i].total / total) * 100).round()}%',
-                style: text.labelSmall
-                    ?.copyWith(color: ChartPalette.axisLabel(colours)),
+              // Amount + percent grouped and right-aligned; sized to content so
+              // it can't starve the label column.
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    currency.format(categories[i].total),
+                    style: text.bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
+                  Text(
+                    total == 0
+                        ? ''
+                        : '${((categories[i].total / total) * 100).round()}%',
+                    style: text.labelSmall
+                        ?.copyWith(color: ChartPalette.axisLabel(colours)),
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
+                ],
               ),
             ],
           ),
@@ -90,11 +111,12 @@ class CategoryDonut extends StatelessWidget {
       ],
     );
 
-    // Donut left, legend right — wraps to stacked on very narrow widths.
+    // Donut left, legend right only when there's genuine room; otherwise
+    // stack (donut on top, full-width legend below) so labels never crush.
     return LayoutBuilder(builder: (context, c) {
-      if (c.maxWidth < 320) {
+      if (c.maxWidth < 380) {
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Center(child: donut),
             const SizedBox(height: AppTokens.space5),
@@ -106,7 +128,7 @@ class CategoryDonut extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           donut,
-          const SizedBox(width: AppTokens.space6),
+          const SizedBox(width: AppTokens.space5),
           Expanded(child: legend),
         ],
       );
