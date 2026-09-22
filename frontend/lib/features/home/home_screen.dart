@@ -102,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final text    = Theme.of(context).textTheme;
     final colours = Theme.of(context).colorScheme;
+    final compact = Breakpoints.isCompact(context);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -109,7 +110,12 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () => context.push('/add-bill'),
         backgroundColor: colours.primary,
         foregroundColor: colours.onPrimary,
-        icon: const Icon(Icons.add),
+        elevation: 2,
+        extendedTextStyle: text.titleLarge?.copyWith(
+          fontSize: compact ? 14 : 15,
+          fontWeight: FontWeight.w600,
+        ),
+        icon: Icon(Icons.add, size: compact ? 20 : 24),
         label: const Text('Add bill'),
       ),
       body: SafeArea(
@@ -179,6 +185,18 @@ class _HomeScreenState extends State<HomeScreen> {
           }).toList();
 
     final statusLine = _statusLine(_bills);
+    final compact = Breakpoints.isCompact(context);
+
+    // Mobile-tuned type: smaller title + status on phones (less cognitive load).
+    final titleStyle = compact
+        ? text.headlineLarge?.copyWith(fontSize: 20, height: 1.1)
+        : text.headlineLarge;
+    final statusStyle = compact
+        ? text.titleLarge?.copyWith(
+            fontSize: 15, fontWeight: FontWeight.w500, height: 1.3)
+        : text.titleLarge;
+    final topPad = compact ? AppTokens.space5 : AppTokens.space6;
+    final gapAfterTitle = compact ? AppTokens.space2 : AppTokens.space3;
 
     return RefreshIndicator(
       color: colours.primary,
@@ -190,13 +208,13 @@ class _HomeScreenState extends State<HomeScreen> {
             // ── Page title ────────────────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppTokens.screenEdge, AppTokens.space6,
+                padding: EdgeInsets.fromLTRB(
+                  AppTokens.screenEdge, topPad,
                   AppTokens.screenEdge, 0,
                 ),
                 child: Text(
                   'Your bills',
-                  style: text.headlineLarge,
+                  style: titleStyle,
                 ),
               ),
             ),
@@ -206,13 +224,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Semantics(
                 header: true,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppTokens.screenEdge, AppTokens.space5,
-                    AppTokens.screenEdge, AppTokens.space5,
+                  padding: EdgeInsets.fromLTRB(
+                    AppTokens.screenEdge, gapAfterTitle,
+                    AppTokens.screenEdge,
+                    compact ? AppTokens.space4 : AppTokens.space5,
                   ),
                   child: _StatusHeadline(
                     statusLine: statusLine,
-                    textStyle: text.titleLarge,
+                    textStyle: statusStyle,
                   ),
                 ),
               ),
@@ -342,10 +361,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (date == null) return '';
     final now = DateTime.now();
     final diff = date.difference(DateTime(now.year, now.month, now.day)).inDays;
-    if (diff == 0) return 'Due today';
-    if (diff == 1) return 'Due tomorrow';
-    if (diff < 0) return 'Overdue by ${-diff} day${-diff == 1 ? '' : 's'}';
-    return 'Due ${DateFormat('MMMM d').format(date)}';
+    if (diff == 0) return 'today';
+    if (diff == 1) return 'tomorrow';
+    if (diff < 0) return 'overdue by ${-diff} day${-diff == 1 ? '' : 's'}';
+    return 'on ${DateFormat('MMM d').format(date)}';
   }
 
   String _statusLine(List<Bill> bills) {

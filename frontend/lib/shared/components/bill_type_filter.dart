@@ -15,6 +15,7 @@
 
 import 'package:flutter/material.dart';
 import '../../theme/tokens.dart';
+import '../layout/responsive.dart';
 import 'category_icons.dart';
 
 /// Sentinel meaning "no type filter" (the All chip).
@@ -44,9 +45,10 @@ class BillTypeFilter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final entries = <String>[kAllBillTypes, ...types];
+    final compact = Breakpoints.isCompact(context);
 
     return SizedBox(
-      height: 44,
+      height: compact ? 38 : 44,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppTokens.screenEdge),
@@ -68,6 +70,7 @@ class BillTypeFilter extends StatelessWidget {
                     CategoryIcons.kindFor(type, serviceType: type)),
             count: counts?[type],
             selected: type == selected,
+            compact: compact,
             onTap: () => onSelected(type),
           );
         },
@@ -83,6 +86,7 @@ class _FilterChip extends StatelessWidget {
     required this.accent,
     required this.count,
     required this.selected,
+    required this.compact,
     required this.onTap,
   });
 
@@ -91,6 +95,7 @@ class _FilterChip extends StatelessWidget {
   final Color? accent;
   final int? count;
   final bool selected;
+  final bool compact;
   final VoidCallback onTap;
 
   @override
@@ -119,8 +124,9 @@ class _FilterChip extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOut,
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppTokens.space4, vertical: AppTokens.space2),
+            padding: EdgeInsets.symmetric(
+                horizontal: compact ? AppTokens.space3 : AppTokens.space4,
+                vertical: AppTokens.space2),
             decoration: BoxDecoration(
               color: bg,
               borderRadius: BorderRadius.circular(AppTokens.radiusSelector),
@@ -130,17 +136,18 @@ class _FilterChip extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: 16, color: selected ? glyph : fg),
-                const SizedBox(width: AppTokens.space2),
+                Icon(icon, size: compact ? 14 : 16, color: selected ? glyph : fg),
+                SizedBox(width: compact ? AppTokens.space1 : AppTokens.space2),
                 Text(
                   label,
                   style: text.labelLarge?.copyWith(
+                    fontSize: compact ? 13 : null,
                     color: fg,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                   ),
                 ),
                 if (count != null) ...[
-                  const SizedBox(width: AppTokens.space2),
+                  SizedBox(width: compact ? AppTokens.space1 : AppTokens.space2),
                   Text(
                     '$count',
                     style: text.labelSmall?.copyWith(

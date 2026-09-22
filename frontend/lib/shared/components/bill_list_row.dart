@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../theme/accents.dart';
 import '../../theme/tokens.dart';
+import '../layout/responsive.dart';
 import 'category_icons.dart';
 
 class BillListRow extends StatelessWidget {
@@ -39,6 +40,17 @@ class BillListRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final text    = Theme.of(context).textTheme;
     final colours = Theme.of(context).colorScheme;
+    final compact = Breakpoints.isCompact(context);
+
+    // Mobile-tuned metrics — calmer type + a smaller tile on phones.
+    final tileSize     = compact ? 40.0 : 46.0;
+    final providerSize = compact ? 15.0 : 16.0;
+    final amountSize   = compact ? 16.0 : 18.0;
+    final daySize      = compact ? 17.0 : 19.0;
+    final dateColWidth = compact ? 32.0 : 36.0;
+    final gap          = compact ? AppTokens.space2 : AppTokens.space3;
+    final vPad         = compact ? AppTokens.space3 : AppTokens.space4;
+    final statusMax    = compact ? 96.0 : 132.0;
 
     final statusLabel = _statusLabel();
     final statusColor = isOverdue
@@ -51,16 +63,16 @@ class BillListRow extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTokens.radiusBox),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
+          padding: EdgeInsets.symmetric(
             horizontal: AppTokens.space2,
-            vertical: AppTokens.space4, // more breathing room
+            vertical: vPad,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // ── Date (month over day) ────────────────────────────────
               SizedBox(
-                width: 36,
+                width: dateColWidth,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -78,6 +90,7 @@ class BillListRow extends StatelessWidget {
                     Text(
                       dueDate != null ? DateFormat('d').format(dueDate!) : '',
                       style: text.titleLarge?.copyWith(
+                        fontSize: daySize,
                         color: colours.onSurface,
                         fontWeight: FontWeight.w600,
                         height: 1.15,
@@ -86,11 +99,15 @@ class BillListRow extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: AppTokens.space3),
+              SizedBox(width: gap),
 
               // ── Colored category tile ────────────────────────────────
-              CategoryTile(text: provider, serviceType: serviceType),
-              const SizedBox(width: AppTokens.space3),
+              CategoryTile(
+                text: provider,
+                serviceType: serviceType,
+                dimension: tileSize,
+              ),
+              SizedBox(width: gap),
 
               // ── Provider + subtitle ──────────────────────────────────
               Expanded(
@@ -101,12 +118,13 @@ class BillListRow extends StatelessWidget {
                     Text(
                       provider,
                       style: text.titleLarge?.copyWith(
+                        fontSize: providerSize,
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 2),
                     Text(
                       interpretation,
                       style: text.bodySmall?.copyWith(
@@ -118,11 +136,11 @@ class BillListRow extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: AppTokens.space3),
+              SizedBox(width: gap),
 
               // ── Amount + status label (amount leads) ─────────────────
               ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 132),
+                constraints: BoxConstraints(maxWidth: statusMax),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisSize: MainAxisSize.min,
@@ -133,6 +151,7 @@ class BillListRow extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.end,
                       style: text.titleLarge?.copyWith(
+                        fontSize: amountSize,
                         fontWeight: FontWeight.w700,
                         color: isOverdue
                             ? AppAccents.danger
@@ -140,7 +159,7 @@ class BillListRow extends StatelessWidget {
                       ),
                     ),
                     if (statusLabel != null) ...[
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 2),
                       Text(
                         statusLabel,
                         maxLines: 1,

@@ -48,6 +48,11 @@ class Breakpoints {
 
   static bool isDesktop(BuildContext context) =>
       of(context) == DeviceClass.desktop;
+
+  /// True on narrow phones (< 400pt) where type/spacing should tighten the
+  /// most. Distinct from [isMobile] (which covers larger phones/tablets too).
+  static bool isCompact(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < 400;
 }
 
 /// Centers page content at a comfortable maximum width on wide screens
