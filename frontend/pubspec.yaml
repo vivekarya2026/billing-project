@@ -43,7 +43,7 @@ dependencies:
   # UUID generation for new bill IDs
   uuid: ^4.5.1
 
-  # Google Fonts — Newsreader (serif display) + Inter (body)
+  # Google Fonts (runtime fallback) — Inter is also bundled locally below.
   google_fonts: ^6.2.1
 
 dev_dependencies:
@@ -56,3 +56,14 @@ flutter:
   assets:
     - .env
     - assets/images/
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.woff2
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.woff2
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.woff2
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.woff2
+          weight: 700

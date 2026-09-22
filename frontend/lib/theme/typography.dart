@@ -1,89 +1,89 @@
 // typography.dart
 // ---------------
 // Type scale — Inter throughout, matching the daisyUI 5 design system's
-// `--font-sans: "Inter"`. Clean sans headings replace the previous serif so
-// the app reads as a daisyUI-styled product.
+// `--font-sans: "Inter"`. Inter is bundled locally (assets/fonts) so it ships
+// with the app — no runtime Google Fonts CDN fetch.
 //
 // Rules:
-//   - D4: body is 19pt, not HIG's 17pt
-//   - The amount (textAmount) is always the LARGEST element on screen
-//   - 13pt is the floor — nothing smaller ships
+//   - Base body is 16pt (calm, low cognitive load)
+//   - The amount (textAmount) is the LARGEST element on screen
+//   - 12pt is the floor — nothing smaller ships
 //   - Tabular figures for all currency: fontFeatures: [FontFeature.tabularFigures()]
 //   - Dynamic Type: all styles respond to MediaQuery.textScaler
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'tokens.dart';
 
 TextTheme buildTextTheme(ColorScheme colours) {
-  final interSans = GoogleFonts.inter(
-    color: colours.onSurface,
-    height: 1.4,
-  );
-
-  // Headings: Inter, tighter leading, semibold — daisyUI heading feel.
-  final interDisplay = GoogleFonts.inter(
-    color: colours.onSurface,
-    height: 1.15,
-  );
+  TextStyle inter({
+    required double size,
+    FontWeight weight = FontWeight.normal,
+    double height = 1.4,
+    Color? color,
+    List<FontFeature>? features,
+  }) =>
+      TextStyle(
+        fontFamily: 'Inter',
+        fontSize: size,
+        fontWeight: weight,
+        height: height,
+        color: color ?? colours.onSurface,
+        fontFeatures: features,
+      );
 
   return TextTheme(
     // ── Display — the dollar amount, largest on screen ────────────────
-    displayLarge: interSans.copyWith(
-      fontSize: AppTokens.textAmount,
-      fontWeight: FontWeight.w700,
-      fontFeatures: const [FontFeature.tabularFigures()],
+    displayLarge: inter(
+      size: AppTokens.textAmount,
+      weight: FontWeight.w700,
       height: 1.1,
+      features: const [FontFeature.tabularFigures()],
     ),
 
     // ── Display — onboarding hero ─────────────────────────────────────
-    displayMedium: interDisplay.copyWith(
-      fontSize: AppTokens.textLargeTitle,
-      fontWeight: FontWeight.w700,
+    displayMedium: inter(
+      size: AppTokens.textLargeTitle,
+      weight: FontWeight.w700,
+      height: 1.15,
     ),
 
     // ── Headline — screen section titles ──────────────────────────────
-    headlineLarge: interDisplay.copyWith(
-      fontSize: AppTokens.textTitle1,
-      fontWeight: FontWeight.w700,
+    headlineLarge: inter(
+      size: AppTokens.textTitle1,
+      weight: FontWeight.w700,
+      height: 1.15,
     ),
 
     // ── Headline — section headers, provider names ────────────────────
-    headlineMedium: interSans.copyWith(
-      fontSize: AppTokens.textTitle3,
-      fontWeight: FontWeight.w600,
+    headlineMedium: inter(
+      size: AppTokens.textTitle3,
+      weight: FontWeight.w600,
     ),
 
     // ── Title — interpretation sentence / card labels ─────────────────
-    titleLarge: interSans.copyWith(
-      fontSize: AppTokens.textHeadline,
-      fontWeight: FontWeight.w600,
+    titleLarge: inter(
+      size: AppTokens.textHeadline,
+      weight: FontWeight.w600,
     ),
 
-    // ── Body — D4: 19pt default body text ─────────────────────────────
-    bodyLarge: interSans.copyWith(
-      fontSize: AppTokens.textBody,
-      fontWeight: FontWeight.normal,
-    ),
+    // ── Body — base: 16pt default body text ───────────────────────────
+    bodyLarge: inter(size: AppTokens.textBody),
 
     // ── Body — secondary detail / subhead ─────────────────────────────
-    bodyMedium: interSans.copyWith(
-      fontSize: AppTokens.textSubhead,
-      fontWeight: FontWeight.normal,
+    bodyMedium: inter(
+      size: AppTokens.textSubhead,
       color: colours.onSurfaceVariant,
     ),
 
     // ── Body small — dates, metadata ─────────────────────────────────
-    bodySmall: interSans.copyWith(
-      fontSize: AppTokens.textFootnote,
-      fontWeight: FontWeight.normal,
+    bodySmall: inter(
+      size: AppTokens.textFootnote,
       color: colours.onSurfaceVariant,
     ),
 
-    // ── Label — provenance, captions (floor: 13pt) ────────────────────
-    labelSmall: interSans.copyWith(
-      fontSize: AppTokens.textCaption,
-      fontWeight: FontWeight.normal,
+    // ── Label — provenance, captions (floor: 12pt) ────────────────────
+    labelSmall: inter(
+      size: AppTokens.textCaption,
       color: colours.onSurfaceVariant,
     ),
   );

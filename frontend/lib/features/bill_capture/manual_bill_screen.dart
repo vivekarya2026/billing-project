@@ -249,7 +249,7 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
                     prefixText: r'$ ',
                   ),
                   style: text.displayLarge?.copyWith(
-                    fontSize: 40,
+                    fontSize: AppTokens.textAmount,
                     fontWeight: FontWeight.w700,
                   ),
                   validator: (v) {

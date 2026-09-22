@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../theme/accents.dart';
+import '../../theme/tokens.dart';
 import 'category_icons.dart';
 
 class BillListRow extends StatelessWidget {
@@ -141,7 +142,7 @@ class BillListRow extends StatelessWidget {
                         maxLines: 1,
                         style: text.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
-                          fontSize: 19,
+                          fontSize: AppTokens.textTitle3,
                           color: isOverdue
                               ? AppAccents.danger
                               : colours.onSurface,

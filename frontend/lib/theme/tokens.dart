@@ -51,17 +51,17 @@ class AppTokens {
   static const double radiusXl   = 16.0;
   static const double radiusFull = 100.0;
 
-  // ── Typography sizes (D4: body = 19 pt) ──────────────────────────────
-  static const double textAmount     = 48.0;   // bill amount — always largest
-  static const double textLargeTitle = 34.0;   // onboarding headline
-  static const double textBody       = 19.0;   // D4 — body copy
-  static const double textTitle1     = 28.0;   // h1 equivalent
-  static const double textTitle2     = 22.0;   // h2 equivalent
-  static const double textTitle3     = 20.0;   // h3 equivalent
-  static const double textHeadline   = 17.0;   // semibold headline
-  static const double textSubhead    = 15.0;   // secondary detail
-  static const double textFootnote   = 13.0;   // dates, metadata (floor)
-  static const double textCaption    = 13.0;   // captions/badges
+  // ── Typography sizes (base body = 16 pt — calmer, lower cognitive load) ─
+  static const double textAmount     = 34.0;   // bill amount — still largest, not shouty
+  static const double textLargeTitle = 26.0;   // onboarding headline
+  static const double textBody       = 16.0;   // base body copy
+  static const double textTitle1     = 22.0;   // h1 equivalent
+  static const double textTitle2     = 19.0;   // h2 equivalent
+  static const double textTitle3     = 17.0;   // h3 equivalent
+  static const double textHeadline   = 15.0;   // semibold headline
+  static const double textSubhead    = 14.0;   // secondary detail
+  static const double textFootnote   = 12.0;   // dates, metadata (floor)
+  static const double textCaption    = 12.0;   // captions/badges
 
   // ── Layout / responsive (daisyUI breakpoints) ────────────────────────
   //   mobile  < 640   |  sm ≥ 640  |  md ≥ 768  |  lg ≥ 1024  |  2xl ≥ 1536
