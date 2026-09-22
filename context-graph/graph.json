@@ -1,0 +1,2120 @@
+{
+  "nodes": [
+    {
+      "id": "ver_1_0",
+      "entity_type": "Version",
+      "label": "v1.0 — Local-first iOS",
+      "attributes": {
+        "date": "2026-09-17",
+        "status": "approved",
+        "summary": "Original architecture: native iOS, no backend, no account, on-device models."
+      }
+    },
+    {
+      "id": "ver_2_0",
+      "entity_type": "Version",
+      "label": "v2.0 — Cloud / Multi-platform",
+      "attributes": {
+        "date": "2026-09-17",
+        "status": "active",
+        "summary": "Pivot: Flutter web+iOS+Android, Supabase, OAuth, Python FastAPI AI service."
+      }
+    },
+    {
+      "id": "dec_d1",
+      "entity_type": "Decision",
+      "label": "D1: Universal design, not an elderly-specific product",
+      "attributes": {
+        "id": "D1",
+        "decision": "Universal design, not an elderly-specific product",
+        "rationale": "Designing for the hardest case produces a better product for everyone. An accessibility mode admits the default is bad.",
+        "made_by": "Owner",
+        "superseded_by_v2": false
+      }
+    },
+    {
+      "id": "dec_d2",
+      "entity_type": "Decision",
+      "label": "D2: Bills and consumption integrated, bills as the spine",
+      "attributes": {
+        "id": "D2",
+        "decision": "Bills and consumption integrated, bills as the spine",
+        "rationale": "Most US utility bills print usage and a 13-month comparison, so consumption comes free with extraction",
+        "made_by": "Owner",
+        "superseded_by_v2": false
+      }
+    },
+    {
+      "id": "dec_d3",
+      "entity_type": "Decision",
+      "label": "D3: MVP ingestion is manual entry plus photo/PDF capture",
+      "attributes": {
+        "id": "D3",
+        "decision": "MVP ingestion is manual entry plus photo/PDF capture",
+        "rationale": "Green Button excludes bill line items, so utility API connection cannot answer the core question anyway",
+        "made_by": "Owner, after analysis",
+        "superseded_by_v2": false
+      }
+    },
+    {
+      "id": "dec_d4",
+      "entity_type": "Decision",
+      "label": "D4: Utility account connection deferred to COULD",
+      "attributes": {
+        "id": "D4",
+        "decision": "Utility account connection deferred to COULD",
+        "rationale": "Registration burden per utility is high, commercial aggregators are enterprise-priced",
+        "made_by": "Owner",
+        "superseded_by_v2": false
+      }
+    },
+    {
+      "id": "dec_d5",
+      "entity_type": "Decision",
+      "label": "D5: Ship Option B then A",
+      "attributes": {
+        "id": "D5",
+        "decision": "Ship Option B then A",
+        "rationale": "Ship the spine first, add change decomposition once extraction accuracy is proven in the wild",
+        "made_by": "Owner",
+        "superseded_by_v2": false
+      }
+    },
+    {
+      "id": "dec_d6",
+      "entity_type": "Decision",
+      "label": "D6: Batch multi-file drop is a MUST, and is the onboarding",
+      "attributes": {
+        "id": "D6",
+        "decision": "Batch multi-file drop is a MUST, and is the onboarding",
+        "rationale": "Solves the cold start problem: twelve months dropped at signup means a full baseline before first use",
+        "made_by": "Owner",
+        "superseded_by_v2": false
+      }
+    },
+    {
+      "id": "dec_d7",
+      "entity_type": "Decision",
+      "label": "D7: Local-first architecture",
+      "attributes": {
+        "id": "D7",
+        "decision": "Local-first architecture",
+        "rationale": "Privacy position, zero inference cost, no account required, works offline",
+        "made_by": "Owner",
+        "superseded_by_v2": true
+      }
+    },
+    {
+      "id": "dec_d8",
+      "entity_type": "Decision",
+      "label": "D8: L2 specifically: local by default, per-bill cloud consent on",
+      "attributes": {
+        "id": "D8",
+        "decision": "L2 specifically: local by default, per-bill cloud consent on failure",
+        "rationale": "Pure local degrades badly on poor photos. L2 keeps the promise honest and verifiable.",
+        "made_by": "Delegated to PM",
+        "superseded_by_v2": false
+      }
+    },
+    {
+      "id": "dec_d9",
+      "entity_type": "Decision",
+      "label": "D9: Household sharing and the caregiver use case are out for v1",
+      "attributes": {
+        "id": "D9",
+        "decision": "Household sharing and the caregiver use case are out for v1",
+        "rationale": "Direct cost of local-first. Accepted knowingly.",
+        "made_by": "Owner",
+        "superseded_by_v2": false
+      }
+    },
+    {
+      "id": "dec_d10",
+      "entity_type": "Decision",
+      "label": "D10: Anomaly flagging is a MUST, not a SHOULD",
+      "attributes": {
+        "id": "D10",
+        "decision": "Anomaly flagging is a MUST, not a SHOULD",
+        "rationale": "It is the reason anyone opens the app",
+        "made_by": "Owner",
+        "superseded_by_v2": false
+      }
+    },
+    {
+      "id": "persona_rafael",
+      "entity_type": "Persona",
+      "label": "Rafael Ocampo",
+      "attributes": {
+        "role": "Warehouse night shift, 61. Rents a two-bedroom.",
+        "technical_comfort": "Low. Phone only, no computer, no printer, storage nearly full.",
+        "quote": "\"Tell me the number I have to pay and the day. Everything else is noise until I know that.\"",
+        "breaks": "Language. Photo-only capture. Arrears versus usage. The entire alert tone.",
+        "is_market": false,
+        "is_constraint": true
+      }
+    },
+    {
+      "id": "persona_marguerite",
+      "entity_type": "Persona",
+      "label": "Marguerite Oyelaran",
+      "attributes": {
+        "role": "Retired school administrator, 74. Lives alone.",
+        "technical_comfort": "Low to medium. iPad daily for messages and photos. Reading glasses.",
+        "quote": "\"I don't need a chart. I need someone to tell me if I'm alright.\"",
+        "breaks": "Type size. Target size. Any sentence needing a glossary. Any flow requiring trust.",
+        "is_market": false,
+        "is_constraint": true
+      }
+    },
+    {
+      "id": "persona_dana",
+      "entity_type": "Persona",
+      "label": "Dana Whitfield",
+      "attributes": {
+        "role": "Operations coordinator, 43, married, two kids, owns her home.",
+        "technical_comfort": "Medium. Confident with apps, not spreadsheets.",
+        "quote": "\"I pay them. I don't understand them. I've made peace with that and I hate it.\"",
+        "breaks": "None — Dana is the primary market, not a constraint.",
+        "is_market": true,
+        "is_constraint": false
+      }
+    },
+    {
+      "id": "persona_wes",
+      "entity_type": "Persona",
+      "label": "Wes Tanaka",
+      "attributes": {
+        "role": "Backend engineer, 38. Owns his house plus a rental unit.",
+        "technical_comfort": "High. Already runs Home Assistant with a smart meter integration.",
+        "quote": "\"If I can't see how you got the number, I assume you got it wrong.\"",
+        "breaks": "Solar and net metering. Multi-property. Data opacity. Export.",
+        "is_market": true,
+        "is_constraint": false
+      }
+    },
+    {
+      "id": "ux_fitts",
+      "entity_type": "UXLaw",
+      "label": "Fitts's Law",
+      "attributes": {
+        "description": "Larger, closer targets are faster to hit. Drives 60px minimum target."
+      }
+    },
+    {
+      "id": "ux_hick",
+      "entity_type": "UXLaw",
+      "label": "Hick's Law",
+      "attributes": {
+        "description": "More choices = more time to decide. Drives max 5 items per screen, 2 top-level choices."
+      }
+    },
+    {
+      "id": "ux_miller",
+      "entity_type": "UXLaw",
+      "label": "Miller's Law",
+      "attributes": {
+        "description": "Working memory holds ~7 items. Drives max 5 items per screen and chunked line items."
+      }
+    },
+    {
+      "id": "ux_jakob",
+      "entity_type": "UXLaw",
+      "label": "Jakob's Law",
+      "attributes": {
+        "description": "Users expect sites to work like other sites they know. Borrow bank-statement and text-message patterns."
+      }
+    },
+    {
+      "id": "ux_tesler",
+      "entity_type": "UXLaw",
+      "label": "Tesler's Law",
+      "attributes": {
+        "description": "Complexity can't be removed, only moved. We move it from user to system; depth always reachable."
+      }
+    },
+    {
+      "id": "ux_peak_end",
+      "entity_type": "UXLaw",
+      "label": "Peak-End Rule",
+      "attributes": {
+        "description": "People remember the peak and the end of an experience. Every flow ends on an answer, never a dashboard."
+      }
+    },
+    {
+      "id": "ux_aesthetic",
+      "entity_type": "UXLaw",
+      "label": "Aesthetic-Usability Effect",
+      "attributes": {
+        "description": "Polished design is perceived as more usable. Visual quality IS the trust signal here."
+      }
+    },
+    {
+      "id": "ux_doherty",
+      "entity_type": "UXLaw",
+      "label": "Doherty Threshold",
+      "attributes": {
+        "description": "Responses under 400ms eliminate user impatience. Capture-to-answer target is under 30 seconds."
+      }
+    },
+    {
+      "id": "dev_d1",
+      "entity_type": "Deviation",
+      "label": "HIG Deviation D1",
+      "attributes": {
+        "id": "D1",
+        "hig_default": "44×44pt minimum touch target",
+        "our_rule": "**60×60pt minimum**",
+        "why": "44 is a floor, not a target. Marguerite's reading glasses and Rafael's cracked screen set the bar. Apple itself uses 60pt on visionOS, so there is precedent. Exceeding a minimum is not a violation."
+      }
+    },
+    {
+      "id": "dev_d2",
+      "entity_type": "Deviation",
+      "label": "HIG Deviation D2",
+      "attributes": {
+        "id": "D2",
+        "hig_default": "System red for alerts and warnings",
+        "our_rule": "**Red only for destructive confirmation.** Never for bill status.",
+        "why": "Rafael has been targeted by shutoff scams. Alarm styling from us is indistinguishable from fraud to him. Bill status is carried in words, never colour."
+      }
+    },
+    {
+      "id": "dev_d3",
+      "entity_type": "Deviation",
+      "label": "HIG Deviation D3",
+      "attributes": {
+        "id": "D3",
+        "hig_default": "Tab bar for top-level navigation",
+        "our_rule": "**No tab bar.** Home plus persistent Add.",
+        "why": "Hick's Law. Five tabs is five decisions on every launch for a product with two real destinations."
+      }
+    },
+    {
+      "id": "dev_d4",
+      "entity_type": "Deviation",
+      "label": "HIG Deviation D4",
+      "attributes": {
+        "id": "D4",
+        "hig_default": "17pt body text",
+        "our_rule": "**19pt body text**, with full Dynamic Type support",
+        "why": "17 is correct for a general app. This one gets read once, slowly, by someone in reading glasses. Dynamic Type is Apple's native answer to accessibility without a bolt-on mode, which is exactly the universal design position."
+      }
+    },
+    {
+      "id": "feat_m1",
+      "entity_type": "Feature",
+      "label": "M1: Batch multi-file drop",
+      "attributes": {
+        "id": "M1",
+        "priority": "MUST",
+        "name": "Batch multi-file drop",
+        "user_value": "Solves cold start. Drop 12 months, get a baseline before first use.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m2",
+      "entity_type": "Feature",
+      "label": "M2: Per-file triage and classification",
+      "attributes": {
+        "id": "M2",
+        "priority": "MUST",
+        "name": "Per-file triage and classification",
+        "user_value": "Identifies provider, service, period, account, duplicates.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m3",
+      "entity_type": "Feature",
+      "label": "M3: Guided capture UI",
+      "attributes": {
+        "id": "M3",
+        "priority": "MUST",
+        "name": "Guided capture UI",
+        "user_value": "On-device extraction depends on image quality.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m4",
+      "entity_type": "Feature",
+      "label": "M4: Extraction with confidence and provenance",
+      "attributes": {
+        "id": "M4",
+        "priority": "MUST",
+        "name": "Extraction with confidence and provenance",
+        "user_value": "Turns unreadable document into structured data.",
+        "complexity": "L",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m5",
+      "entity_type": "Feature",
+      "label": "M5: Arithmetic self-validation",
+      "attributes": {
+        "id": "M5",
+        "priority": "MUST",
+        "name": "Arithmetic self-validation",
+        "user_value": "Line items must sum to total; usage × rate = energy charge.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m6",
+      "entity_type": "Feature",
+      "label": "M6: Targeted confirmation",
+      "attributes": {
+        "id": "M6",
+        "priority": "MUST",
+        "name": "Targeted confirmation",
+        "user_value": "Ask only about fields that failed validation.",
+        "complexity": "S",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m7",
+      "entity_type": "Feature",
+      "label": "M7: Bill-type classification",
+      "attributes": {
+        "id": "M7",
+        "priority": "MUST",
+        "name": "Bill-type classification",
+        "user_value": "Detects budget billing, estimated reads, arrears, solar credits.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m8",
+      "entity_type": "Feature",
+      "label": "M8: Unified due view",
+      "attributes": {
+        "id": "M8",
+        "priority": "MUST",
+        "name": "Unified due view",
+        "user_value": "One screen, all providers, what is owed and when.",
+        "complexity": "S",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m9",
+      "entity_type": "Feature",
+      "label": "M9: Provenance and audit trail",
+      "attributes": {
+        "id": "M9",
+        "priority": "MUST",
+        "name": "Provenance and audit trail",
+        "user_value": "Every number traceable to the pixel it was read from.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m10",
+      "entity_type": "Feature",
+      "label": "M10: Encrypted local backup and restore",
+      "attributes": {
+        "id": "M10",
+        "priority": "MUST",
+        "name": "Encrypted local backup and restore",
+        "user_value": "No server means device loss is total loss.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m11",
+      "entity_type": "Feature",
+      "label": "M11: Per-bill cloud consent",
+      "attributes": {
+        "id": "M11",
+        "priority": "MUST",
+        "name": "Per-bill cloud consent",
+        "user_value": "The L2 promise: user controls what leaves the device.",
+        "complexity": "S",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_m12",
+      "entity_type": "Feature",
+      "label": "M12: Change decomposition (R2)",
+      "attributes": {
+        "id": "M12",
+        "priority": "MUST",
+        "name": "Change decomposition (R2)",
+        "user_value": "Splits bill delta into rate, usage, fixed, one-offs.",
+        "complexity": "L",
+        "release": "Release 2"
+      }
+    },
+    {
+      "id": "feat_m13",
+      "entity_type": "Feature",
+      "label": "M13: Anomaly flagging (R2)",
+      "attributes": {
+        "id": "M13",
+        "priority": "MUST",
+        "name": "Anomaly flagging (R2)",
+        "user_value": "Flags components outside expected bounds, with phone script.",
+        "complexity": "M",
+        "release": "Release 2"
+      }
+    },
+    {
+      "id": "feat_s1",
+      "entity_type": "Feature",
+      "label": "S1: Plan and contract change detection",
+      "attributes": {
+        "id": "S1",
+        "priority": "SHOULD",
+        "name": "Plan and contract change detection",
+        "user_value": "Catches expired supply contracts.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_s2",
+      "entity_type": "Feature",
+      "label": "S2: Due date reminders",
+      "attributes": {
+        "id": "S2",
+        "priority": "SHOULD",
+        "name": "Due date reminders",
+        "user_value": "Prevents the late fee.",
+        "complexity": "S",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_s3",
+      "entity_type": "Feature",
+      "label": "S3: Export (CSV and JSON)",
+      "attributes": {
+        "id": "S3",
+        "priority": "SHOULD",
+        "name": "Export (CSV and JSON)",
+        "user_value": "Wes will not commit without it.",
+        "complexity": "S",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_s4",
+      "entity_type": "Feature",
+      "label": "S4: Output language setting",
+      "attributes": {
+        "id": "S4",
+        "priority": "SHOULD",
+        "name": "Output language setting",
+        "user_value": "Rafael reads Spanish; bills stay in English.",
+        "complexity": "S",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_s5",
+      "entity_type": "Feature",
+      "label": "S5: Assistance programme surfacing",
+      "attributes": {
+        "id": "S5",
+        "priority": "SHOULD",
+        "name": "Assistance programme surfacing",
+        "user_value": "Surfaces help programmes for users with arrears.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_s6",
+      "entity_type": "Feature",
+      "label": "S6: Corrected bill versioning",
+      "attributes": {
+        "id": "S6",
+        "priority": "SHOULD",
+        "name": "Corrected bill versioning",
+        "user_value": "Re-issued bill supersedes original without losing it.",
+        "complexity": "S",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_s7",
+      "entity_type": "Feature",
+      "label": "S7: Grounded conversation",
+      "attributes": {
+        "id": "S7",
+        "priority": "SHOULD",
+        "name": "Grounded conversation",
+        "user_value": "Wes's escape hatch: AI answers from extracted data only.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_s8",
+      "entity_type": "Feature",
+      "label": "S8: Report generation and export",
+      "attributes": {
+        "id": "S8",
+        "priority": "SHOULD",
+        "name": "Report generation and export",
+        "user_value": "Wes's artifact.",
+        "complexity": "S",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_s9",
+      "entity_type": "Feature",
+      "label": "S9: Register switching",
+      "attributes": {
+        "id": "S9",
+        "priority": "SHOULD",
+        "name": "Register switching",
+        "user_value": "One engine, three levels of detail.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_c1",
+      "entity_type": "Feature",
+      "label": "C1: Utility account connect",
+      "attributes": {
+        "id": "C1",
+        "priority": "COULD",
+        "name": "Utility account connect",
+        "user_value": "Green Button proof of concept.",
+        "complexity": "L",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_c2",
+      "entity_type": "Feature",
+      "label": "C2: Smart meter ingest",
+      "attributes": {
+        "id": "C2",
+        "priority": "COULD",
+        "name": "Smart meter ingest",
+        "user_value": "Reconciles interval data against what was billed.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_c3",
+      "entity_type": "Feature",
+      "label": "C3: Voice input and output",
+      "attributes": {
+        "id": "C3",
+        "priority": "COULD",
+        "name": "Voice input and output",
+        "user_value": "Universal design payoff.",
+        "complexity": "M",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_c4",
+      "entity_type": "Feature",
+      "label": "C4: Household sharing and sync",
+      "attributes": {
+        "id": "C4",
+        "priority": "COULD",
+        "name": "Household sharing and sync",
+        "user_value": "Explicitly deferred.",
+        "complexity": "L",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "feat_c5",
+      "entity_type": "Feature",
+      "label": "C5: Full solar and net metering support",
+      "attributes": {
+        "id": "C5",
+        "priority": "COULD",
+        "name": "Full solar and net metering support",
+        "user_value": "MVP detects and flags only.",
+        "complexity": "L",
+        "release": "Release 1"
+      }
+    },
+    {
+      "id": "story_us_001",
+      "entity_type": "UserStory",
+      "label": "US-001: Batch onboarding drop",
+      "attributes": {
+        "id": "US-001",
+        "title": "Batch onboarding drop",
+        "priority": "MUST",
+        "complexity": "M",
+        "dependencies": [
+          "US-002",
+          "US-004",
+          "US-005"
+        ],
+        "summary": "**As a** new user,"
+      }
+    },
+    {
+      "id": "story_us_002",
+      "entity_type": "UserStory",
+      "label": "US-002: Per-file triage",
+      "attributes": {
+        "id": "US-002",
+        "title": "Per-file triage",
+        "priority": "MUST",
+        "complexity": "M",
+        "dependencies": [],
+        "summary": "**As a** user dropping mixed files,"
+      }
+    },
+    {
+      "id": "story_us_003",
+      "entity_type": "UserStory",
+      "label": "US-003: Guided capture",
+      "attributes": {
+        "id": "US-003",
+        "title": "Guided capture",
+        "priority": "MUST",
+        "complexity": "M",
+        "dependencies": [],
+        "summary": "Rafael can photograph a folded paper bill and get a usable image on the first or second attempt."
+      }
+    },
+    {
+      "id": "story_us_004",
+      "entity_type": "UserStory",
+      "label": "US-004: Extraction with confidence and provenance",
+      "attributes": {
+        "id": "US-004",
+        "title": "Extraction with confidence and provenance",
+        "priority": "MUST",
+        "complexity": "L",
+        "dependencies": [
+          "US-003"
+        ],
+        "summary": "**As a** user,"
+      }
+    },
+    {
+      "id": "story_us_005",
+      "entity_type": "UserStory",
+      "label": "US-005: Arithmetic self-validation",
+      "attributes": {
+        "id": "US-005",
+        "title": "Arithmetic self-validation",
+        "priority": "MUST",
+        "complexity": "M",
+        "dependencies": [
+          "US-004"
+        ],
+        "summary": "**As a** user,"
+      }
+    },
+    {
+      "id": "story_us_006",
+      "entity_type": "UserStory",
+      "label": "US-006: Targeted confirmation",
+      "attributes": {
+        "id": "US-006",
+        "title": "Targeted confirmation",
+        "priority": "MUST",
+        "complexity": "S",
+        "dependencies": [
+          "US-005"
+        ],
+        "summary": "Dana confirms only the two or three fields that failed validation, not the whole bill."
+      }
+    },
+    {
+      "id": "story_us_007",
+      "entity_type": "UserStory",
+      "label": "US-007: Bill-type classification",
+      "attributes": {
+        "id": "US-007",
+        "title": "Bill-type classification",
+        "priority": "MUST",
+        "complexity": "M",
+        "dependencies": [
+          "US-004"
+        ],
+        "summary": "**As a** user on a budget billing plan,"
+      }
+    },
+    {
+      "id": "story_us_008",
+      "entity_type": "UserStory",
+      "label": "US-008: Unified due view",
+      "attributes": {
+        "id": "US-008",
+        "title": "Unified due view",
+        "priority": "MUST",
+        "complexity": "S",
+        "dependencies": [
+          "US-004"
+        ],
+        "summary": "Marguerite opens the app and sees, on one screen, whether anything is owed and whether anything looks wrong."
+      }
+    },
+    {
+      "id": "story_us_009",
+      "entity_type": "UserStory",
+      "label": "US-009: Provenance and audit trail",
+      "attributes": {
+        "id": "US-009",
+        "title": "Provenance and audit trail",
+        "priority": "MUST",
+        "complexity": "M",
+        "dependencies": [
+          "US-004"
+        ],
+        "summary": "Wes taps any number and sees the region of the source bill it was read from."
+      }
+    },
+    {
+      "id": "story_us_010",
+      "entity_type": "UserStory",
+      "label": "US-010: Encrypted local backup and restore",
+      "attributes": {
+        "id": "US-010",
+        "title": "Encrypted local backup and restore",
+        "priority": "MUST",
+        "complexity": "M",
+        "dependencies": [],
+        "summary": "A user who loses or replaces their phone can restore their bill history."
+      }
+    },
+    {
+      "id": "story_us_011",
+      "entity_type": "UserStory",
+      "label": "US-011: Per-bill cloud consent",
+      "attributes": {
+        "id": "US-011",
+        "title": "Per-bill cloud consent",
+        "priority": "MUST",
+        "complexity": "S",
+        "dependencies": [
+          "US-005"
+        ],
+        "summary": "**As a** privacy-conscious user,"
+      }
+    },
+    {
+      "id": "story_us_012",
+      "entity_type": "UserStory",
+      "label": "US-012: Change decomposition",
+      "attributes": {
+        "id": "US-012",
+        "title": "Change decomposition",
+        "priority": "MUST",
+        "complexity": "L",
+        "dependencies": [
+          "US-005",
+          "US-007"
+        ],
+        "summary": "**As a** user seeing a higher bill,"
+      }
+    },
+    {
+      "id": "story_us_013",
+      "entity_type": "UserStory",
+      "label": "US-013: Anomaly flagging",
+      "attributes": {
+        "id": "US-013",
+        "title": "Anomaly flagging",
+        "priority": "MUST",
+        "complexity": "M",
+        "dependencies": [
+          "US-012"
+        ],
+        "summary": "**As a** user,"
+      }
+    },
+    {
+      "id": "story_us_014",
+      "entity_type": "UserStory",
+      "label": "US-014: Plan and contract change detection",
+      "attributes": {
+        "id": "US-014",
+        "title": "Plan and contract change detection",
+        "priority": "SHOULD",
+        "complexity": "M",
+        "dependencies": [],
+        "summary": "The app detects from the bill that a supply contract expired or a rate plan changed."
+      }
+    },
+    {
+      "id": "story_us_015",
+      "entity_type": "UserStory",
+      "label": "US-015: Due date reminders",
+      "attributes": {
+        "id": "US-015",
+        "title": "Due date reminders",
+        "priority": "SHOULD",
+        "complexity": "S",
+        "dependencies": [],
+        "summary": "The user is reminded before a bill is due."
+      }
+    },
+    {
+      "id": "story_us_016",
+      "entity_type": "UserStory",
+      "label": "US-016: Export",
+      "attributes": {
+        "id": "US-016",
+        "title": "Export",
+        "priority": "SHOULD",
+        "complexity": "S",
+        "dependencies": [],
+        "summary": "Wes exports everything as CSV and JSON."
+      }
+    },
+    {
+      "id": "story_us_017",
+      "entity_type": "UserStory",
+      "label": "US-017: Output language",
+      "attributes": {
+        "id": "US-017",
+        "title": "Output language",
+        "priority": "SHOULD",
+        "complexity": "S",
+        "dependencies": [],
+        "summary": "Rafael reads the app in Spanish while his bills stay in English."
+      }
+    },
+    {
+      "id": "story_us_018",
+      "entity_type": "UserStory",
+      "label": "US-018: Assistance programme surfacing",
+      "attributes": {
+        "id": "US-018",
+        "title": "Assistance programme surfacing",
+        "priority": "SHOULD",
+        "complexity": "M",
+        "dependencies": [],
+        "summary": "A user with arrears or a disconnection notice is shown the assistance programmes available in their state."
+      }
+    },
+    {
+      "id": "story_us_019",
+      "entity_type": "UserStory",
+      "label": "US-019: Corrected bill versioning",
+      "attributes": {
+        "id": "US-019",
+        "title": "Corrected bill versioning",
+        "priority": "SHOULD",
+        "complexity": "S",
+        "dependencies": [],
+        "summary": "A re-issued bill supersedes the original without losing it."
+      }
+    },
+    {
+      "id": "story_us_020",
+      "entity_type": "UserStory",
+      "label": "US-020: Grounded conversation",
+      "attributes": {
+        "id": "US-020",
+        "title": "Grounded conversation",
+        "priority": "SHOULD",
+        "complexity": "M",
+        "dependencies": [],
+        "summary": "Wes asks a question about his bills and gets an answer drawn only from extracted data."
+      }
+    },
+    {
+      "id": "pipe_0",
+      "entity_type": "PipelineStage",
+      "label": "Stage 0: Triage",
+      "attributes": {
+        "stage": 0,
+        "name": "Triage",
+        "description": "Is this a bill, which provider, period, account, duplicate?",
+        "engine": "On-device model"
+      }
+    },
+    {
+      "id": "pipe_1",
+      "entity_type": "PipelineStage",
+      "label": "Stage 1: Extraction",
+      "attributes": {
+        "stage": 1,
+        "name": "Extraction",
+        "description": "Structured line items, per-field confidence, bounding region on source",
+        "engine": "Vision OCR + on-device model"
+      }
+    },
+    {
+      "id": "pipe_2",
+      "entity_type": "PipelineStage",
+      "label": "Stage 2: Self-validation",
+      "attributes": {
+        "stage": 2,
+        "name": "Self-validation",
+        "description": "Does the arithmetic close? Deterministic only.",
+        "engine": "Deterministic code — no model"
+      }
+    },
+    {
+      "id": "pipe_3",
+      "entity_type": "PipelineStage",
+      "label": "Stage 3: Classification",
+      "attributes": {
+        "stage": 3,
+        "name": "Classification",
+        "description": "Budget billing, estimated read, solar, arrears, mid-cycle rate change",
+        "engine": "On-device model + rules"
+      }
+    },
+    {
+      "id": "pipe_4",
+      "entity_type": "PipelineStage",
+      "label": "Stage 4: Reconciliation",
+      "attributes": {
+        "stage": 4,
+        "name": "Reconciliation",
+        "description": "Dedupe, timeline, account identity, invalid comparison windows",
+        "engine": "Deterministic code"
+      }
+    },
+    {
+      "id": "pipe_5",
+      "entity_type": "PipelineStage",
+      "label": "Stage 5: Analysis",
+      "attributes": {
+        "stage": 5,
+        "name": "Analysis",
+        "description": "Normalise per day, compare like-to-like, decompose delta",
+        "engine": "Deterministic code — no model"
+      }
+    },
+    {
+      "id": "pipe_6",
+      "entity_type": "PipelineStage",
+      "label": "Stage 6: Narration",
+      "attributes": {
+        "stage": 6,
+        "name": "Narration",
+        "description": "State the computed result once, clearly, at the right register",
+        "engine": "On-device model"
+      }
+    },
+    {
+      "id": "pipe_7",
+      "entity_type": "PipelineStage",
+      "label": "Stage 7: Conversation",
+      "attributes": {
+        "stage": 7,
+        "name": "Conversation",
+        "description": "Answer questions grounded in extracted data only",
+        "engine": "On-device model"
+      }
+    },
+    {
+      "id": "sec_sec_pm_001",
+      "entity_type": "SecurityItem",
+      "label": "SEC-PM-001",
+      "attributes": {
+        "id": "SEC-PM-001",
+        "category": "data_protection",
+        "consideration": "Utility bills contain full name, service address, account number and payment history. PII with identity-theft value, not merely financial data.",
+        "owner": "architect"
+      }
+    },
+    {
+      "id": "sec_sec_pm_002",
+      "entity_type": "SecurityItem",
+      "label": "SEC-PM-002",
+      "attributes": {
+        "id": "SEC-PM-002",
+        "category": "data_protection",
+        "consideration": "The cloud fallback path sends bill imagery to a third party. Where it runs, what it retains, and how that is disclosed is product-defining, not a vendor choice.",
+        "owner": "architect"
+      }
+    },
+    {
+      "id": "sec_sec_pm_003",
+      "entity_type": "SecurityItem",
+      "label": "SEC-PM-003",
+      "attributes": {
+        "id": "SEC-PM-003",
+        "category": "data_protection",
+        "consideration": "Local-first is the architecture. Every design decision must preserve it, and any server-side component requires explicit re-approval.",
+        "owner": "architect"
+      }
+    },
+    {
+      "id": "sec_sec_pm_004",
+      "entity_type": "SecurityItem",
+      "label": "SEC-PM-004",
+      "attributes": {
+        "id": "SEC-PM-004",
+        "category": "authorization",
+        "consideration": "Users may add bills in another person's name, legitimate for renters and family. We must never verify ownership, and must never allow this to become a surveillance mechanism.",
+        "owner": "architect"
+      }
+    },
+    {
+      "id": "sec_sec_pm_005",
+      "entity_type": "SecurityItem",
+      "label": "SEC-PM-005",
+      "attributes": {
+        "id": "SEC-PM-005",
+        "category": "compliance",
+        "consideration": "US only. State privacy laws apply, notably CCPA/CPRA. Utility account data may carry additional state protections. Legal review before launch.",
+        "owner": "architect"
+      }
+    },
+    {
+      "id": "sec_sec_pm_006",
+      "entity_type": "SecurityItem",
+      "label": "SEC-PM-006",
+      "attributes": {
+        "id": "SEC-PM-006",
+        "category": "data_protection",
+        "consideration": "Export and deletion must be real and complete. Largely simplified by local-first, but the encrypted backup is now the surface that matters.",
+        "owner": "architect"
+      }
+    },
+    {
+      "id": "sec_sec_pm_007",
+      "entity_type": "SecurityItem",
+      "label": "SEC-PM-007",
+      "attributes": {
+        "id": "SEC-PM-007",
+        "category": "data_protection",
+        "consideration": "Encrypted local backup becomes the single point of data loss and the single most valuable artifact to steal. Key handling is critical.",
+        "owner": "architect"
+      }
+    },
+    {
+      "id": "flow_01",
+      "entity_type": "Flow",
+      "label": "Flow 01: IA site map",
+      "attributes": {
+        "id": "01",
+        "title": "IA site map"
+      }
+    },
+    {
+      "id": "flow_02",
+      "entity_type": "Flow",
+      "label": "Flow 02: Navigation depth",
+      "attributes": {
+        "id": "02",
+        "title": "Navigation depth"
+      }
+    },
+    {
+      "id": "flow_03",
+      "entity_type": "Flow",
+      "label": "Flow 03: First run, batch onboarding",
+      "attributes": {
+        "id": "03",
+        "title": "First run, batch onboarding"
+      }
+    },
+    {
+      "id": "flow_04",
+      "entity_type": "Flow",
+      "label": "Flow 04: Empty and first-run states",
+      "attributes": {
+        "id": "04",
+        "title": "Empty and first-run states"
+      }
+    },
+    {
+      "id": "flow_05",
+      "entity_type": "Flow",
+      "label": "Flow 05: Monthly single bill, happy path",
+      "attributes": {
+        "id": "05",
+        "title": "Monthly single bill, happy path"
+      }
+    },
+    {
+      "id": "flow_06",
+      "entity_type": "Flow",
+      "label": "Flow 06: Capture quality and retake",
+      "attributes": {
+        "id": "06",
+        "title": "Capture quality and retake"
+      }
+    },
+    {
+      "id": "flow_07",
+      "entity_type": "Flow",
+      "label": "Flow 07: Validation failure, confirm, cloud consent",
+      "attributes": {
+        "id": "07",
+        "title": "Validation failure, confirm, cloud consent"
+      }
+    },
+    {
+      "id": "flow_08",
+      "entity_type": "Flow",
+      "label": "Flow 08: Anomaly, evidence, phone script",
+      "attributes": {
+        "id": "08",
+        "title": "Anomaly, evidence, phone script"
+      }
+    },
+    {
+      "id": "flow_09",
+      "entity_type": "Flow",
+      "label": "Flow 09: Bill-type branching",
+      "attributes": {
+        "id": "09",
+        "title": "Bill-type branching"
+      }
+    },
+    {
+      "id": "flow_10",
+      "entity_type": "Flow",
+      "label": "Flow 10: Data lifecycle",
+      "attributes": {
+        "id": "10",
+        "title": "Data lifecycle"
+      }
+    },
+    {
+      "id": "cp_global_css",
+      "entity_type": "CodePractice",
+      "label": "Global CSS / JS",
+      "attributes": {
+        "description": "All design tokens live in one global CSS/JS file. Edit one place, change everywhere. No inline styles."
+      }
+    },
+    {
+      "id": "cp_fe_be_sep",
+      "entity_type": "CodePractice",
+      "label": "Frontend / Backend separation",
+      "attributes": {
+        "description": "Frontend (Flutter) and backend (Supabase + FastAPI) are in separate top-level folders. They talk via HTTP/REST."
+      }
+    },
+    {
+      "id": "cp_flutter_theme",
+      "entity_type": "CodePractice",
+      "label": "Flutter Global Theme",
+      "attributes": {
+        "description": "All HIG tokens (60px targets, 19pt body, no-status-colour) are declared in lib/theme/ and injected via ThemeData."
+      }
+    },
+    {
+      "id": "cp_python_ai",
+      "entity_type": "CodePractice",
+      "label": "Python for AI + Graphs",
+      "attributes": {
+        "description": "The AI/OCR pipeline and the analytics dashboard are Python only. No model arithmetic — models narrate, code computes."
+      }
+    },
+    {
+      "id": "cp_no_model_math",
+      "entity_type": "CodePractice",
+      "label": "No Model Arithmetic",
+      "attributes": {
+        "description": "Language models never compute bill totals. Deterministic Python code does arithmetic. Models only read images and write sentences."
+      }
+    },
+    {
+      "id": "cp_auth_bypass",
+      "entity_type": "CodePractice",
+      "label": "Auth Bypass for v1 Testing",
+      "attributes": {
+        "description": "OAuth is wired but a BYPASS_AUTH env flag skips it so you can test without logging in."
+      }
+    },
+    {
+      "id": "cp_rls",
+      "entity_type": "CodePractice",
+      "label": "Supabase Row-Level Security",
+      "attributes": {
+        "description": "Every table has RLS enabled. A user only reads rows where user_id matches their JWT."
+      }
+    },
+    {
+      "id": "cp_provenance",
+      "entity_type": "CodePractice",
+      "label": "Provenance by default",
+      "attributes": {
+        "description": "Every extracted field stores a confidence score and a bounding-box region referencing the source image. Nothing displayed without a source."
+      }
+    },
+    {
+      "id": "tc_flutter",
+      "entity_type": "TechComponent",
+      "label": "Flutter",
+      "attributes": {
+        "layer": "frontend",
+        "description": "Single codebase for Web, iOS, and Android. Renders Apple-HIG-inspired UI via custom ThemeData."
+      }
+    },
+    {
+      "id": "tc_supabase",
+      "entity_type": "TechComponent",
+      "label": "Supabase",
+      "attributes": {
+        "layer": "backend",
+        "description": "Postgres + Auth + Storage. Handles user accounts, bill data, image storage, and real-time sync."
+      }
+    },
+    {
+      "id": "tc_fastapi",
+      "entity_type": "TechComponent",
+      "label": "Python FastAPI",
+      "attributes": {
+        "layer": "ai-service",
+        "description": "REST microservice for OCR (image-to-text), bill parsing, and deterministic self-validation engine."
+      }
+    },
+    {
+      "id": "tc_oauth",
+      "entity_type": "TechComponent",
+      "label": "OAuth 2.0",
+      "attributes": {
+        "layer": "auth",
+        "description": "Google + Apple sign-in via Supabase Auth. Bypassed with BYPASS_AUTH flag in v1 for local testing."
+      }
+    },
+    {
+      "id": "tc_ocr",
+      "entity_type": "TechComponent",
+      "label": "PaddleOCR / Tesseract",
+      "attributes": {
+        "layer": "ai-service",
+        "description": "Extracts raw text + bounding boxes from bill images. Feeds the bill-parsing AI layer."
+      }
+    },
+    {
+      "id": "tc_plotly",
+      "entity_type": "TechComponent",
+      "label": "Plotly / Streamlit",
+      "attributes": {
+        "layer": "ai-service",
+        "description": "Python dashboard for spend decomposition and usage analysis graphs."
+      }
+    },
+    {
+      "id": "tc_shadcn_tokens",
+      "entity_type": "TechComponent",
+      "label": "shadcn Design Tokens",
+      "attributes": {
+        "layer": "frontend",
+        "description": "Token vocabulary (radius, spacing, colour, motion) translated into Flutter ThemeData and global CSS variables for web."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "ver_2_0",
+      "target": "ver_1_0",
+      "relation": "supersedes",
+      "confidence": 1.0,
+      "note": "Supersedes D7 (local-first), no-web-app, and no-account decisions"
+    },
+    {
+      "source": "ver_2_0",
+      "target": "dec_d7",
+      "relation": "supersedes",
+      "confidence": 1.0,
+      "note": "Pivot from local-first to Supabase cloud"
+    },
+    {
+      "source": "dev_d1",
+      "target": "ux_fitts",
+      "relation": "justifies",
+      "confidence": 0.95,
+      "note": "Deviation D1 is justified by ux_fitts"
+    },
+    {
+      "source": "dev_d2",
+      "target": "ux_aesthetic",
+      "relation": "justifies",
+      "confidence": 0.95,
+      "note": "Deviation D2 is justified by ux_aesthetic"
+    },
+    {
+      "source": "dev_d3",
+      "target": "ux_hick",
+      "relation": "justifies",
+      "confidence": 0.95,
+      "note": "Deviation D3 is justified by ux_hick"
+    },
+    {
+      "source": "dev_d4",
+      "target": "ux_miller",
+      "relation": "justifies",
+      "confidence": 0.95,
+      "note": "Deviation D4 is justified by ux_miller"
+    },
+    {
+      "source": "feat_m1",
+      "target": "persona_dana",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m1",
+      "target": "persona_wes",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m1",
+      "target": "ux_miller",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_m3",
+      "target": "persona_rafael",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m3",
+      "target": "ux_fitts",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_m4",
+      "target": "persona_wes",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m5",
+      "target": "persona_dana",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m5",
+      "target": "ux_tesler",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_m6",
+      "target": "persona_dana",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m6",
+      "target": "ux_hick",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_m8",
+      "target": "persona_marguerite",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m8",
+      "target": "persona_dana",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m8",
+      "target": "ux_miller",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_m9",
+      "target": "persona_wes",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m9",
+      "target": "ux_aesthetic",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_m10",
+      "target": "persona_marguerite",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m11",
+      "target": "persona_marguerite",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m11",
+      "target": "persona_wes",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m12",
+      "target": "persona_dana",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m12",
+      "target": "persona_wes",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m12",
+      "target": "ux_peak_end",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_m13",
+      "target": "persona_dana",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_m13",
+      "target": "ux_peak_end",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_s2",
+      "target": "ux_jakob",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_s3",
+      "target": "persona_wes",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_s4",
+      "target": "persona_rafael",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_s5",
+      "target": "persona_rafael",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_s5",
+      "target": "persona_marguerite",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_s7",
+      "target": "persona_wes",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_s7",
+      "target": "ux_tesler",
+      "relation": "justifies",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "feat_c2",
+      "target": "persona_wes",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "feat_c4",
+      "target": "persona_wes",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "story_us_001",
+      "target": "feat_m1",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_001",
+      "target": "story_us_002",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_001",
+      "target": "story_us_004",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_001",
+      "target": "story_us_005",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_002",
+      "target": "feat_m2",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_003",
+      "target": "feat_m3",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_004",
+      "target": "feat_m4",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_004",
+      "target": "story_us_003",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_005",
+      "target": "feat_m5",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_005",
+      "target": "story_us_004",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_006",
+      "target": "feat_m6",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_006",
+      "target": "story_us_005",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_007",
+      "target": "feat_m7",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_007",
+      "target": "story_us_004",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_008",
+      "target": "feat_m8",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_008",
+      "target": "story_us_004",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_009",
+      "target": "feat_m9",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_009",
+      "target": "story_us_004",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_010",
+      "target": "feat_m10",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_011",
+      "target": "feat_m11",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_011",
+      "target": "story_us_005",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_012",
+      "target": "feat_m12",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_012",
+      "target": "story_us_005",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_012",
+      "target": "story_us_007",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_013",
+      "target": "feat_m13",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_013",
+      "target": "story_us_012",
+      "relation": "dependsOn",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_014",
+      "target": "feat_s1",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_015",
+      "target": "feat_s2",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_016",
+      "target": "feat_s3",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_017",
+      "target": "feat_s4",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_018",
+      "target": "feat_s5",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_019",
+      "target": "feat_s6",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "story_us_020",
+      "target": "feat_s7",
+      "relation": "implements",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "pipe_0",
+      "target": "pipe_1",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "pipeline sequence"
+    },
+    {
+      "source": "pipe_1",
+      "target": "pipe_2",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "pipeline sequence"
+    },
+    {
+      "source": "pipe_2",
+      "target": "pipe_3",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "pipeline sequence"
+    },
+    {
+      "source": "pipe_3",
+      "target": "pipe_4",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "pipeline sequence"
+    },
+    {
+      "source": "pipe_4",
+      "target": "pipe_5",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "pipeline sequence"
+    },
+    {
+      "source": "pipe_5",
+      "target": "pipe_6",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "pipeline sequence"
+    },
+    {
+      "source": "pipe_6",
+      "target": "pipe_7",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "pipeline sequence"
+    },
+    {
+      "source": "pipe_2",
+      "target": "feat_m5",
+      "relation": "implements",
+      "confidence": 0.95,
+      "note": "Self-validation implements arithmetic check"
+    },
+    {
+      "source": "pipe_1",
+      "target": "feat_m4",
+      "relation": "implements",
+      "confidence": 0.95,
+      "note": "Extraction stage implements provenance"
+    },
+    {
+      "source": "pipe_5",
+      "target": "feat_m12",
+      "relation": "implements",
+      "confidence": 0.9,
+      "note": "Analysis stage implements change decomposition"
+    },
+    {
+      "source": "pipe_3",
+      "target": "feat_m7",
+      "relation": "implements",
+      "confidence": 0.9,
+      "note": "Classification stage implements bill-type detection"
+    },
+    {
+      "source": "sec_sec_pm_001",
+      "target": "feat_m4",
+      "relation": "constrains",
+      "confidence": 0.9,
+      "note": "Bill PII constrains extraction storage"
+    },
+    {
+      "source": "sec_sec_pm_002",
+      "target": "feat_m11",
+      "relation": "constrains",
+      "confidence": 0.95,
+      "note": "Cloud consent constrains fallback"
+    },
+    {
+      "source": "sec_sec_pm_003",
+      "target": "ver_2_0",
+      "relation": "constrains",
+      "confidence": 0.9,
+      "note": "Server components need re-approval per SEC-PM-003"
+    },
+    {
+      "source": "sec_sec_pm_007",
+      "target": "feat_m10",
+      "relation": "constrains",
+      "confidence": 0.95,
+      "note": "Encrypted backup key handling"
+    },
+    {
+      "source": "flow_01",
+      "target": "story_us_001",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "flow_03",
+      "target": "story_us_001",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "flow_03",
+      "target": "story_us_002",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "flow_05",
+      "target": "story_us_003",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "flow_05",
+      "target": "story_us_004",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "flow_07",
+      "target": "story_us_005",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "flow_07",
+      "target": "story_us_006",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "flow_07",
+      "target": "story_us_011",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "flow_08",
+      "target": "story_us_012",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "flow_08",
+      "target": "story_us_013",
+      "relation": "mappedToFlow",
+      "confidence": 0.85,
+      "note": ""
+    },
+    {
+      "source": "tc_flutter",
+      "target": "tc_supabase",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "Flutter calls Supabase for data/auth"
+    },
+    {
+      "source": "tc_flutter",
+      "target": "tc_fastapi",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "Flutter calls FastAPI for AI/OCR"
+    },
+    {
+      "source": "tc_fastapi",
+      "target": "tc_ocr",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "FastAPI orchestrates OCR"
+    },
+    {
+      "source": "tc_fastapi",
+      "target": "tc_supabase",
+      "relation": "linkedTo",
+      "confidence": 0.9,
+      "note": "FastAPI writes extraction results to Supabase"
+    },
+    {
+      "source": "tc_oauth",
+      "target": "tc_supabase",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": "OAuth managed by Supabase Auth"
+    },
+    {
+      "source": "tc_flutter",
+      "target": "tc_shadcn_tokens",
+      "relation": "appliesTo",
+      "confidence": 0.9,
+      "note": "shadcn token vocabulary translated into Flutter ThemeData"
+    },
+    {
+      "source": "cp_fe_be_sep",
+      "target": "tc_flutter",
+      "relation": "constrains",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "cp_fe_be_sep",
+      "target": "tc_supabase",
+      "relation": "constrains",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "cp_fe_be_sep",
+      "target": "tc_fastapi",
+      "relation": "constrains",
+      "confidence": 0.9,
+      "note": ""
+    },
+    {
+      "source": "cp_python_ai",
+      "target": "tc_fastapi",
+      "relation": "justifies",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "cp_python_ai",
+      "target": "tc_plotly",
+      "relation": "justifies",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "cp_no_model_math",
+      "target": "pipe_2",
+      "relation": "constrains",
+      "confidence": 1.0,
+      "note": "Validation must be deterministic code"
+    },
+    {
+      "source": "cp_auth_bypass",
+      "target": "tc_oauth",
+      "relation": "linkedTo",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "cp_rls",
+      "target": "tc_supabase",
+      "relation": "constrains",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "cp_provenance",
+      "target": "feat_m9",
+      "relation": "implements",
+      "confidence": 0.95,
+      "note": ""
+    },
+    {
+      "source": "ver_2_0",
+      "target": "tc_flutter",
+      "relation": "justifies",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "ver_2_0",
+      "target": "tc_supabase",
+      "relation": "justifies",
+      "confidence": 1.0,
+      "note": ""
+    },
+    {
+      "source": "ver_2_0",
+      "target": "tc_fastapi",
+      "relation": "justifies",
+      "confidence": 1.0,
+      "note": ""
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+/* globals.css
+ * -----------
+ * Single source of truth for all design tokens on the web target.
+ * Mirrors lib/theme/tokens.dart — change here and it changes everywhere
+ * on web. Never use raw values in HTML/CSS; always use var(--token).
+ *
+ * HIG deviations enforced here:
+ *   D1: --target-min: 60px  (not HIG's 44px)
+ *   D2: --destructive used for delete confirm ONLY, never bill status
+ *   D4: --text-body: 19pt   (not HIG's 17pt)
+ *
+ * Load order: this file is imported by index.html before Flutter's JS.
+ */
+
+/* ── Light mode (default) ───────────────────────────────────────────── */
+:root {
+  /* Font stack — SF Pro, then system fallbacks */
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+                 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:   'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
+
+  /* Typography (pt → px at 1pt ≈ 1.333px; kept as pt for parity with Dart) */
+  --text-amount:      44pt;   /* dollar amount — always largest element */
+  --text-large-title: 34pt;
+  --text-title1:      28pt;
+  --text-title3:      20pt;
+  --text-headline:    19pt;
+  --text-body:        19pt;   /* D4: 19pt not HIG's 17pt */
+  --text-subhead:     17pt;
+  --text-footnote:    15pt;
+  --text-caption:     13pt;   /* floor — nothing smaller */
+
+  /* Colour — light mode */
+  --label-primary:    #000000;
+  --label-secondary:  rgba(60, 60, 67, 0.60);
+  --label-tertiary:   rgba(60, 60, 67, 0.30);
+  --bg-primary:       #FFFFFF;
+  --bg-secondary:     #F2F2F7;
+  --separator:        rgba(60, 60, 67, 0.29);
+  --action:           #007AFF;  /* system blue — tappable ONLY */
+  --destructive:      #FF3B30;  /* delete confirm ONLY, never bill status */
+
+  /* Spacing (8pt grid) */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --screen-edge: 20px;
+  --card-pad:    20px;
+  --card-gap:    12px;
+
+  /* Border radius (concentric rule: inner + padding = outer) */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;    /* bill cards */
+  --radius-xl:   20px;    /* sheets, modals */
+  --radius-full: 9999px;  /* primary buttons — capsule */
+
+  /* Touch targets (D1) */
+  --target-min: 60px;
+
+  /* Motion */
+  --dur-instant: 100ms;
+  --dur-fast:    200ms;
+  --dur-normal:  300ms;
+  --ease-default: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out:     cubic-bezier(0.00, 0.0, 0.58, 1);
+  --ease-spring:  cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ── Dark mode ──────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --label-primary:   #FFFFFF;
+    --label-secondary: rgba(235, 235, 245, 0.60);
+    --label-tertiary:  rgba(235, 235, 245, 0.30);
+    --bg-primary:      #000000;
+    --bg-secondary:    #1C1C1E;
+    --separator:       rgba(84, 84, 88, 0.60);
+    --action:          #0A84FF;
+    --destructive:     #FF453A;
+  }
+}
+
+/* ── Reduced motion (honour absolutely — see spec motion rules) ─────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+  }
+}
+
+/* ── Base resets ────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-system);
+  font-size: var(--text-body);
+  color: var(--label-primary);
+  background-color: var(--bg-secondary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Never disable zoom — accessibility requirement */
+}
+
+/* Responsive layout — matches TECH-REQUIREMENTS.md breakpoints */
+.app-shell {
+  width: 100%;
+  padding-inline: var(--screen-edge);
+}
+
+/* Tablet+ */
+@media (min-width: 480px) {
+  .app-shell {
+    padding-inline: clamp(var(--screen-edge), 5vw, var(--space-8));
+  }
+}
+
+/* Desktop — centred, capped at 880px */
+@media (min-width: 1024px) {
+  .app-shell {
+    max-width: 880px;
+    margin-inline: auto;
+    padding-inline: var(--space-8);
+  }
+}
+
+/* ── Bill card (signature component) ───────────────────────────────── */
+.bill-card {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--card-pad);
+  border: 0.5px solid var(--separator);
+  margin-bottom: var(--card-gap);
+  min-height: 120px;
+  cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.bill-card:active {
+  opacity: 0.92;
+}
+.bill-card__amount {
+  font-size: var(--text-amount);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;   /* amounts must align vertically */
+  color: var(--label-primary);
+  line-height: 1.2;
+}
+.bill-card__interpretation {
+  font-size: var(--text-headline);
+  font-weight: 400;
+  color: var(--label-primary);
+  line-height: 1.4;
+  margin-top: var(--space-2);
+}
+
+/* ── Primary button (capsule, 60px) ────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--target-min);
+  padding: var(--space-4) var(--space-8);
+  font-family: var(--font-system);
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: #FFFFFF;
+  background: var(--action);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: transform var(--dur-instant) var(--ease-out);
+}
+.btn-primary:active  { transform: scale(0.97); }
+.btn-primary:hover   { opacity: 0.92; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Secondary button */
+.btn-secondary {
+  background: transparent;
+  color: var(--action);
+  border: 1.5px solid var(--action);
+}
+
+/* Destructive — delete confirm ONLY (D2: never on bill status) */
+.btn-destructive {
+  color: var(--destructive);
+  background: transparent;
+  border: none;
+}

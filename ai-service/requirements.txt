@@ -1,0 +1,26 @@
+# ── Core (always required) ───────────────────────────────────────────────
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.9.2
+python-dotenv==1.0.1
+
+# ── Supabase (stage_7_persist — Phase 3) ────────────────────────────────
+supabase==2.10.0
+
+# ── HTTP (stage_0_ingest — Phase 2) ─────────────────────────────────────
+httpx==0.27.2
+
+# ── Testing ───────────────────────────────────────────────────────────────
+pytest==8.3.3
+
+# ── Dashboard (Phase 7) ───────────────────────────────────────────────────
+streamlit==1.39.0
+pandas==2.2.3
+
+# ── OCR (Phase 2 — uncomment to install) ─────────────────────────────────
+# paddlepaddle-cpu  # CPU-only; use paddlepaddle for GPU
+# paddleocr
+
+# ── LLM narration (Phase 6 — uncomment to install) ───────────────────────
+# openai>=1.50.0
+# anthropic>=0.37.0

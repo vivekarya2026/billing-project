@@ -1,0 +1,50 @@
+# ── Secrets / env ─────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── OS / editor ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.iml
+
+# ── Vercel (local link only; do not commit) ───────────────────────────────
+.vercel
+
+# ── Flutter / Dart (frontend) ─────────────────────────────────────────────
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/build/**
+# IMPORTANT: keep the web build committed so Vercel can serve it statically.
+!frontend/build/web/
+!frontend/build/web/**
+frontend/.pub-cache/
+frontend/.pub/
+frontend/ios/Pods/
+frontend/android/.gradle/
+frontend/macos/Pods/
+
+# ── Python (backend / ai-service) ─────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# ── Node (if any tooling appears) ─────────────────────────────────────────
+node_modules/
+npm-debug.log*
+
+# ── Logs / temp ───────────────────────────────────────────────────────────
+*.log
+tmp/
