@@ -14,7 +14,18 @@
 import 'package:flutter/material.dart';
 import 'tokens.dart';
 
-TextTheme buildTextTheme(ColorScheme colours) {
+TextTheme buildTextTheme(ColorScheme colours, {bool compact = false}) {
+  // Pick the size set: compact (phone < 400pt) tightens the whole scale.
+  final sAmount     = compact ? AppTokens.textAmountC     : AppTokens.textAmount;
+  final sLargeTitle = compact ? AppTokens.textLargeTitleC : AppTokens.textLargeTitle;
+  final sBody       = compact ? AppTokens.textBodyC       : AppTokens.textBody;
+  final sTitle1     = compact ? AppTokens.textTitle1C     : AppTokens.textTitle1;
+  final sTitle3     = compact ? AppTokens.textTitle3C     : AppTokens.textTitle3;
+  final sHeadline   = compact ? AppTokens.textHeadlineC   : AppTokens.textHeadline;
+  final sSubhead    = compact ? AppTokens.textSubheadC    : AppTokens.textSubhead;
+  final sFootnote   = compact ? AppTokens.textFootnoteC   : AppTokens.textFootnote;
+  final sCaption    = compact ? AppTokens.textCaptionC    : AppTokens.textCaption;
+
   TextStyle inter({
     required double size,
     FontWeight weight = FontWeight.normal,
@@ -34,7 +45,7 @@ TextTheme buildTextTheme(ColorScheme colours) {
   return TextTheme(
     // ── Display — the dollar amount, largest on screen ────────────────
     displayLarge: inter(
-      size: AppTokens.textAmount,
+      size: sAmount,
       weight: FontWeight.w700,
       height: 1.1,
       features: const [FontFeature.tabularFigures()],
@@ -42,48 +53,48 @@ TextTheme buildTextTheme(ColorScheme colours) {
 
     // ── Display — onboarding hero ─────────────────────────────────────
     displayMedium: inter(
-      size: AppTokens.textLargeTitle,
+      size: sLargeTitle,
       weight: FontWeight.w700,
       height: 1.15,
     ),
 
     // ── Headline — screen section titles ──────────────────────────────
     headlineLarge: inter(
-      size: AppTokens.textTitle1,
+      size: sTitle1,
       weight: FontWeight.w700,
       height: 1.15,
     ),
 
     // ── Headline — section headers, provider names ────────────────────
     headlineMedium: inter(
-      size: AppTokens.textTitle3,
+      size: sTitle3,
       weight: FontWeight.w600,
     ),
 
     // ── Title — interpretation sentence / card labels ─────────────────
     titleLarge: inter(
-      size: AppTokens.textHeadline,
+      size: sHeadline,
       weight: FontWeight.w600,
     ),
 
     // ── Body — base: 16pt default body text ───────────────────────────
-    bodyLarge: inter(size: AppTokens.textBody),
+    bodyLarge: inter(size: sBody),
 
     // ── Body — secondary detail / subhead ─────────────────────────────
     bodyMedium: inter(
-      size: AppTokens.textSubhead,
+      size: sSubhead,
       color: colours.onSurfaceVariant,
     ),
 
     // ── Body small — dates, metadata ─────────────────────────────────
     bodySmall: inter(
-      size: AppTokens.textFootnote,
+      size: sFootnote,
       color: colours.onSurfaceVariant,
     ),
 
-    // ── Label — provenance, captions (floor: 12pt) ────────────────────
+    // ── Label — provenance, captions (floor) ──────────────────────────
     labelSmall: inter(
-      size: AppTokens.textCaption,
+      size: sCaption,
       color: colours.onSurfaceVariant,
     ),
   );

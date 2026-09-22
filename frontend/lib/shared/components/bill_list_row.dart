@@ -42,11 +42,8 @@ class BillListRow extends StatelessWidget {
     final colours = Theme.of(context).colorScheme;
     final compact = Breakpoints.isCompact(context);
 
-    // Mobile-tuned metrics — calmer type + a smaller tile on phones.
+    // Mobile-tuned layout metrics (type sizes come from the responsive theme).
     final tileSize     = compact ? 40.0 : 46.0;
-    final providerSize = compact ? 15.0 : 16.0;
-    final amountSize   = compact ? 16.0 : 18.0;
-    final daySize      = compact ? 17.0 : 19.0;
     final dateColWidth = compact ? 32.0 : 36.0;
     final gap          = compact ? AppTokens.space2 : AppTokens.space3;
     final vPad         = compact ? AppTokens.space3 : AppTokens.space4;
@@ -90,7 +87,6 @@ class BillListRow extends StatelessWidget {
                     Text(
                       dueDate != null ? DateFormat('d').format(dueDate!) : '',
                       style: text.titleLarge?.copyWith(
-                        fontSize: daySize,
                         color: colours.onSurface,
                         fontWeight: FontWeight.w600,
                         height: 1.15,
@@ -118,7 +114,6 @@ class BillListRow extends StatelessWidget {
                     Text(
                       provider,
                       style: text.titleLarge?.copyWith(
-                        fontSize: providerSize,
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
@@ -151,7 +146,6 @@ class BillListRow extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.end,
                       style: text.titleLarge?.copyWith(
-                        fontSize: amountSize,
                         fontWeight: FontWeight.w700,
                         color: isOverdue
                             ? AppAccents.danger

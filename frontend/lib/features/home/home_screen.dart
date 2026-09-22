@@ -111,10 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: colours.primary,
         foregroundColor: colours.onPrimary,
         elevation: 2,
-        extendedTextStyle: text.titleLarge?.copyWith(
-          fontSize: compact ? 14 : 15,
-          fontWeight: FontWeight.w600,
-        ),
+        extendedTextStyle: text.titleLarge?.copyWith(fontWeight: FontWeight.w600),
         icon: Icon(Icons.add, size: compact ? 20 : 24),
         label: const Text('Add bill'),
       ),
@@ -187,13 +184,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final statusLine = _statusLine(_bills);
     final compact = Breakpoints.isCompact(context);
 
-    // Mobile-tuned type: smaller title + status on phones (less cognitive load).
-    final titleStyle = compact
-        ? text.headlineLarge?.copyWith(fontSize: 20, height: 1.1)
-        : text.headlineLarge;
+    // Type sizes now come from the responsive TextTheme (compact on phones).
+    final titleStyle = text.headlineLarge;
     final statusStyle = compact
-        ? text.titleLarge?.copyWith(
-            fontSize: 15, fontWeight: FontWeight.w500, height: 1.3)
+        ? text.titleLarge?.copyWith(fontWeight: FontWeight.w500, height: 1.3)
         : text.titleLarge;
     final topPad = compact ? AppTokens.space5 : AppTokens.space6;
     final gapAfterTitle = compact ? AppTokens.space2 : AppTokens.space3;

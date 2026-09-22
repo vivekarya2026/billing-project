@@ -145,18 +145,26 @@ class _BillMaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = buildRouter();
-    return MaterialApp.router(
-      title: 'BillSense',
-      debugShowCheckedModeBanner: false,
-      theme:     buildTheme(brightness: Brightness.light),
-      darkTheme: buildTheme(brightness: Brightness.dark),
-      themeMode: ThemeMode.dark,
-      routerConfig: router,
-      builder: (context, child) => ColoredBox(
-        // daisyUI base-100 behind any transparent scaffolds.
-        color: Theme.of(context).colorScheme.surface,
-        child: child ?? const SizedBox.shrink(),
-      ),
+    // Phones (< 400pt wide) get the tighter compact type scale; larger
+    // screens keep the comfortable default. LayoutBuilder makes this
+    // reactive to window resizes on web/desktop.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 400;
+        return MaterialApp.router(
+          title: 'BillSense',
+          debugShowCheckedModeBanner: false,
+          theme:     buildTheme(brightness: Brightness.light, compact: compact),
+          darkTheme: buildTheme(brightness: Brightness.dark,  compact: compact),
+          themeMode: ThemeMode.dark,
+          routerConfig: router,
+          builder: (context, child) => ColoredBox(
+            // daisyUI base-100 behind any transparent scaffolds.
+            color: Theme.of(context).colorScheme.surface,
+            child: child ?? const SizedBox.shrink(),
+          ),
+        );
+      },
     );
   }
 }

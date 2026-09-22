@@ -63,6 +63,20 @@ class AppTokens {
   static const double textFootnote   = 12.0;   // dates, metadata (floor)
   static const double textCaption    = 12.0;   // captions/badges
 
+  // ── Compact (phone < 400pt) type scale — tighter, less cognitive load ──
+  //   Title 1/2/3: 22/19/17 → 22/18/16   Headline: 15 → 14
+  //   Subhead: 14 → 12                     Footnote/caption floor: 12 → 10
+  static const double textAmountC     = 28.0;  // amount — proportionally smaller
+  static const double textLargeTitleC = 22.0;
+  static const double textBodyC       = 14.0;
+  static const double textTitle1C     = 22.0;
+  static const double textTitle2C     = 18.0;
+  static const double textTitle3C     = 16.0;
+  static const double textHeadlineC   = 14.0;
+  static const double textSubheadC    = 12.0;
+  static const double textFootnoteC   = 10.0;
+  static const double textCaptionC    = 10.0;
+
   // ── Layout / responsive (daisyUI breakpoints) ────────────────────────
   //   mobile  < 640   |  sm ≥ 640  |  md ≥ 768  |  lg ≥ 1024  |  2xl ≥ 1536
   /// Max content width on wide screens.

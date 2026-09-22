@@ -19,12 +19,12 @@ import 'accents.dart';
 import 'typography.dart';
 import 'tokens.dart';
 
-ThemeData buildTheme({required Brightness brightness}) {
+ThemeData buildTheme({required Brightness brightness, bool compact = false}) {
   final colours = brightness == Brightness.light
       ? AppColours.light
       : AppColours.dark;
 
-  final textTheme = buildTextTheme(colours);
+  final textTheme = buildTextTheme(colours, compact: compact);
 
   // ── Shared helpers ──────────────────────────────────────────────────
   final hairline = BorderSide(color: colours.outline, width: 1);
