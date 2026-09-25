@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/components/list_row.dart';
 import '../../../shared/layout/responsive.dart';
+import '../../../shared/platform/browser_bridge.dart';
 import '../../../state/settings_state.dart';
 import '../../../theme/tokens.dart';
 
@@ -137,13 +138,26 @@ class SettingsScreen extends StatelessWidget {
         subtitle: 'When to remind you about upcoming bills.',
         options: const [
           _Option('off',        'Off',         'No reminders.'),
-          _Option('day_before', 'Day before',  'Notify the day before each due date.'),
-          _Option('day_of',     'Day of',      'Notify on the due date.'),
+          _Option('day_before', 'Day before',
+              'Notify at 9 AM the day before each due date, while BillSense is open in your browser.'),
+          _Option('day_of',     'Day of',
+              'Notify at 9 AM on each due date, while BillSense is open in your browser.'),
         ],
         selected: settings.reminders,
-        onSelect: (val) {
+        onSelect: (val) async {
           settings.setReminders(val);
           Navigator.pop(ctx);
+          if (val == 'off') return;
+          final messenger = ScaffoldMessenger.of(context);
+          final permission = await requestNotificationPermission();
+          if (permission == 'denied') {
+            messenger.showSnackBar(const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                  'Your browser is blocking notifications for BillSense. '
+                  'Allow them in the site settings to get reminders.'),
+            ));
+          }
         },
       ),
     );

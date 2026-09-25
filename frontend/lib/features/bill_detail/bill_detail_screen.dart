@@ -12,6 +12,9 @@
 //   - D2: Words carry status, never colour
 //   - Provenance: every number is tappable → source-region overlay
 //   - 60px touch targets (D1)
+//   - Paying happens here, on the bill itself ("Mark as paid"). Repeating
+//     manual bills also show how often they repeat and can be added to a
+//     calendar.
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,10 +23,14 @@ import 'package:provider/provider.dart';
 import '../../../shared/components/primary_button.dart';
 import '../../../shared/data/bill_repository.dart';
 import '../../../shared/data/fake_bill_repository.dart';
+import '../../../shared/logic/ics_export.dart';
+import '../../../shared/models/repeat_rule.dart';
+import '../../../shared/platform/browser_bridge.dart';
 import '../../../shared/models/bill.dart';
 import '../../../shared/models/extraction_field.dart';
 import '../../../shared/models/line_item.dart';
 import '../../../shared/services/ai_service_client.dart';
+import '../../../state/recurring_bills.dart';
 import '../../../state/settings_state.dart';
 import '../../../theme/tokens.dart';
 
@@ -96,6 +103,7 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsState>();
+    final recurring = context.watch<RecurringBills>();
 
     return Scaffold(
       body: FutureBuilder<_DetailData>(
@@ -119,16 +127,78 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
             );
           }
           final bill = snap.data!.bill;
+          final rule = recurring.ruleFor(bill.accountId);
           return _BillDetailBody(
             bill:       bill,
+            rule:       rule,
             register:   settings.detailLevel,
             fetchDrivers: _fetchDrivers,
             onEdit:     () => context.push('/manual-bill?id=${widget.billId}'),
             onDelete:   () => _confirmAndDelete(bill),
+            onSetPaid:  (paid) => _setPaid(bill, paid),
+            onAddToCalendar: rule == null
+                ? null
+                : () => _addToCalendar(bill, rule, settings.reminders),
           );
         },
       ),
     );
+  }
+
+  // ── Mark as paid / unpaid, with Undo ────────────────────────────────────
+  Future<void> _setPaid(BillDetail bill, bool paid) async {
+    final repo = context.read<BillRepository>();
+    await repo.updateBill(bill.id, {'is_paid': paid});
+    if (!mounted) return;
+    setState(_load);
+
+    final next = bill.dueDate == null
+        ? null
+        : RecurringBills.instance.nextAfter(bill.accountId, bill.dueDate!);
+    final message = !paid
+        ? 'Marked ${bill.provider} unpaid.'
+        : (next != null
+            ? 'Marked ${bill.provider} paid. Next one is due ${DateFormat('MMM d').format(next)}.'
+            : 'Marked ${bill.provider} paid.');
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 5),
+        content: Text(message),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () async {
+            await repo.updateBill(bill.id, {'is_paid': !paid});
+            if (mounted) setState(_load);
+          },
+        ),
+      ),
+    );
+  }
+
+  // ── Add to calendar (repeating bills) ───────────────────────────────────
+  void _addToCalendar(BillDetail bill, RepeatRule rule, String reminders) {
+    final ics = buildIcs(
+      uid: rule.accountId,
+      name: bill.provider,
+      amount: bill.amountDue,
+      rule: rule,
+      firstDue: bill.dueDate ?? rule.anchor,
+      leadDays: reminders == 'day_before' ? 1 : (reminders == 'day_of' ? 0 : null),
+      hour: reminderHour,
+    );
+    final slug = bill.provider.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
+    final ok = downloadTextFile('$slug.ics', ics, 'text/calendar');
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(ok
+            ? 'Downloaded $slug.ics. Open it to add ${bill.provider} to your calendar.'
+            : 'Calendar files can only be downloaded in the browser.'),
+      ));
   }
 
   // ── Delete with confirmation + Undo (M15) ───────────────────────────────
@@ -164,6 +234,9 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
     if (confirmed != true || !mounted) return;
 
     final repo = context.read<BillRepository>();
+    final next = bill.dueDate == null
+        ? null
+        : RecurringBills.instance.nextAfter(bill.accountId, bill.dueDate!);
     await repo.deleteBill(bill.id);
     if (!mounted) return;
 
@@ -175,7 +248,10 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
       SnackBar(
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 5),
-        content: Text('Deleted ${bill.provider}.'),
+        content: Text(next != null && bill.dueDate != null
+            ? 'Deleted ${bill.provider} for ${DateFormat('MMM d').format(bill.dueDate!)}. '
+              'Next one is due ${DateFormat('MMM d').format(next)}.'
+            : 'Deleted ${bill.provider}.'),
         action: SnackBarAction(
           label: 'Undo',
           onPressed: () {
@@ -194,13 +270,19 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
 class _BillDetailBody extends StatelessWidget {
   const _BillDetailBody({
     required this.bill,
+    required this.rule,
     required this.register,
     required this.fetchDrivers,
     required this.onEdit,
     required this.onDelete,
+    required this.onSetPaid,
+    required this.onAddToCalendar,
   });
 
   final BillDetail bill;
+  final RepeatRule? rule;
+  final ValueChanged<bool> onSetPaid;
+  final VoidCallback? onAddToCalendar;
   final DetailLevel register;
   final Future<List<SpendDriver>> Function(BillDetail) fetchDrivers;
   final VoidCallback onEdit;
@@ -240,6 +322,7 @@ class _BillDetailBody extends StatelessWidget {
               tooltip: 'Bill actions',
               onSelected: (v) {
                 if (v == 'edit') onEdit();
+                if (v == 'calendar') onAddToCalendar?.call();
                 if (v == 'delete') onDelete();
               },
               itemBuilder: (ctx) => [
@@ -251,6 +334,15 @@ class _BillDetailBody extends StatelessWidget {
                     title: Text('Edit'),
                   ),
                 ),
+                if (onAddToCalendar != null)
+                  const PopupMenuItem(
+                    value: 'calendar',
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.event_outlined),
+                      title: Text('Add to calendar'),
+                    ),
+                  ),
                 const PopupMenuItem(
                   value: 'delete',
                   child: ListTile(
@@ -286,6 +378,11 @@ class _BillDetailBody extends StatelessWidget {
               Text(_fmtDate(bill.dueDate).isNotEmpty
                   ? 'Due ${_fmtDate(bill.dueDate)}' : '',
                   style: text.bodySmall),
+              if (rule != null)
+                Text(rule!.phrase, style: text.bodySmall),
+
+              const SizedBox(height: AppTokens.space4),
+              _PaidControl(isPaid: bill.isPaid, onSetPaid: onSetPaid),
 
               const SizedBox(height: AppTokens.space4),
               Divider(color: colours.outline, thickness: 0.5),
@@ -327,6 +424,38 @@ class _BillDetailBody extends StatelessWidget {
           ],
           ),
         ),
+    );
+  }
+}
+
+// ── Mark as paid (paying happens on the bill) ─────────────────────────────
+
+class _PaidControl extends StatelessWidget {
+  const _PaidControl({required this.isPaid, required this.onSetPaid});
+  final bool isPaid;
+  final ValueChanged<bool> onSetPaid;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    if (!isPaid) {
+      return AppButton(
+        label: 'Mark as paid',
+        variant: ButtonVariant.secondary,
+        onPressed: () => onSetPaid(true),
+      );
+    }
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: AppTokens.targetMin),
+      child: Row(
+        children: [
+          Expanded(child: Text('Paid.', style: text.bodyLarge)),
+          TextButton(
+            onPressed: () => onSetPaid(false),
+            child: const Text('Mark as unpaid'),
+          ),
+        ],
+      ),
     );
   }
 }

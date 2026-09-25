@@ -5,7 +5,9 @@
 // The user types just what they know:
 //   • Bill name / provider  (e.g. "Ohio Edison", "Netflix")
 //   • Amount
-//   • Due date (optional)
+//   • Due date (optional; required when the bill repeats)
+//   • Repeats (optional; manual bills only, since scanned bills repeat by
+//     arriving). Each cycle then appears as its own bill (RecurringBills).
 //
 // The category icon updates LIVE as the name is typed (CategoryIcons), so the
 // user never picks a category. On save the bill is written through the same
@@ -20,13 +22,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../../shared/components/primary_button.dart';
 import '../../../shared/components/category_icons.dart';
 import '../../../shared/data/bill_repository.dart';
 import '../../../shared/data/fake_bill_repository.dart';
+import '../../../shared/logic/recurrence.dart';
+import '../../../shared/models/repeat_rule.dart';
 import '../../../shared/services/supabase_client.dart';
+import '../../../state/recurring_bills.dart';
 import '../../../theme/tokens.dart';
 
 class ManualBillScreen extends StatefulWidget {
@@ -43,18 +49,35 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
   final _form   = GlobalKey<FormState>();
   final _name   = TextEditingController();
   final _amount = TextEditingController();
+  final _customDays = TextEditingController();
   DateTime? _dueDate;
+  DateTime? _originalDue;
+  RepeatEvery? _repeat;
+  String? _accountId;
+  bool _dueMissing = false;
   bool _saving = false;
   bool _loading = false;
   String? _error;
 
   bool get _isEdit => widget.billId != null;
 
+  int get _days => _repeat == RepeatEvery.custom
+      ? (int.tryParse(_customDays.text.trim()) ?? 0)
+      : 0;
+
+  String get _repeatPhrase => _repeat!.repeatsPhrase(_days);
+
+  bool get _canRepeat =>
+      _accountId == null ||
+      _accountId == 'manual' ||
+      RecurringBills.isRepeatAccount(_accountId!);
+
   @override
   void initState() {
     super.initState();
     // Rebuild on name change so the live icon updates.
     _name.addListener(() => setState(() {}));
+    _customDays.addListener(() => setState(() {}));
     if (_isEdit) _prefill();
   }
 
@@ -70,6 +93,13 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
           _amount.text = bill.amountDue!.toStringAsFixed(2);
         }
         _dueDate = bill.dueDate;
+        _originalDue = bill.dueDate;
+        _accountId = bill.accountId;
+        final rule = RecurringBills.instance.ruleFor(bill.accountId);
+        _repeat = rule?.every;
+        if (rule?.every == RepeatEvery.custom) {
+          _customDays.text = '${rule!.days}';
+        }
         _loading = false;
       });
     } catch (_) {
@@ -81,6 +111,7 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
   void dispose() {
     _name.dispose();
     _amount.dispose();
+    _customDays.dispose();
     super.dispose();
   }
 
@@ -94,15 +125,23 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
       firstDate: DateTime(now.year - 1),
       lastDate: DateTime(now.year + 2),
     );
-    if (picked != null) setState(() => _dueDate = picked);
+    if (picked != null) {
+      setState(() {
+        _dueDate = picked;
+        _dueMissing = false;
+      });
+    }
   }
 
   Future<void> _save() async {
-    if (!(_form.currentState?.validate() ?? false)) return;
+    final formOk = _form.currentState?.validate() ?? false;
+    setState(() => _dueMissing = _repeat != null && _dueDate == null);
+    if (!formOk || _dueMissing) return;
     setState(() { _saving = true; _error = null; });
 
     try {
       final repo = context.read<BillRepository>();
+      final recurring = RecurringBills.instance;
       const uuid = Uuid();
       final billId = uuid.v4();
 
@@ -129,12 +168,32 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
 
       if (_isEdit) {
         // ── Edit mode: apply an in-place update (M15) ──────────────────
-        await repo.updateBill(widget.billId!, {
+        final changes = <String, dynamic>{
           'provider':     name,
           'service_type': serviceType,
           'amount_due':   amount,
           'due_date':     dueIso,
-        });
+        };
+        final acc = _accountId ?? 'manual';
+        if (_canRepeat && _repeat != null) {
+          final target = RecurringBills.isRepeatAccount(acc)
+              ? acc : recurring.newAccountId();
+          if (target != acc) changes['account_id'] = target;
+          await repo.updateBill(widget.billId!, changes);
+          final rule = recurring.ruleFor(target);
+          if (rule == null ||
+              rule.every != _repeat ||
+              rule.days != _days ||
+              _dueDate != _originalDue) {
+            await recurring.setRule(
+              accountId: target, billId: widget.billId!,
+              every: _repeat!, due: _dueDate!, days: _days,
+            );
+          }
+        } else {
+          await repo.updateBill(widget.billId!, changes);
+          if (RecurringBills.isRepeatAccount(acc)) recurring.removeRule(acc);
+        }
         // Return to the Bills list (never a dead-end); offer a tap-through to
         // the updated detail.
         if (mounted) {
@@ -156,10 +215,11 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
         return;
       }
 
+      final accountId = _repeat != null ? recurring.newAccountId() : 'manual';
       await repo.createBill({
         'id':                billId,
         'user_id':           userId,
-        'account_id':        'manual',
+        'account_id':        accountId,
         'provider':          name,
         'name':              name,
         'service_type':      serviceType,
@@ -169,10 +229,16 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
         'extraction_status': 'done',
       });
 
-      final narration = _isOffline
+      final narration = _isOffline && _repeat == null
           ? 'Added manually. Nothing to compare yet.'
           : 'Added manually.';
       await repo.updateBillNarration(billId, narration);
+      if (_repeat != null) {
+        await recurring.setRule(
+          accountId: accountId, billId: billId,
+          every: _repeat!, due: _dueDate!, days: _days,
+        );
+      }
 
       // UX: creating a bill returns the user to the Bills list (home), where
       // the new row is now visible — not a dead-end detail screen. A brief
@@ -185,7 +251,9 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
           SnackBar(
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 4),
-            content: Text('Added $name.'),
+            content: Text(_repeat != null
+                ? 'Added $name. $_repeatPhrase.'
+                : 'Added $name.'),
             action: SnackBarAction(
               label: 'View',
               onPressed: () => context.push('/bill/$billId'),
@@ -310,7 +378,10 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
                         vertical: AppTokens.space3),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-                      border: Border.all(color: colours.outline, width: 0.5),
+                      border: Border.all(
+                        color: _dueMissing ? colours.error : colours.outline,
+                        width: _dueMissing ? 1 : 0.5,
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -320,7 +391,9 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
                         Expanded(
                           child: Text(
                             _dueDate == null
-                                ? 'Add a due date (optional)'
+                                ? (_repeat != null
+                                    ? 'Add a due date'
+                                    : 'Add a due date (optional)')
                                 : 'Due ${_dueDate!.month}/${_dueDate!.day}/${_dueDate!.year}',
                             style: text.bodyLarge?.copyWith(
                               color: _dueDate == null
@@ -338,6 +411,27 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
                     ),
                   ),
                 ),
+                if (_dueMissing) ...[
+                  const SizedBox(height: AppTokens.space2),
+                  Text(
+                    'Pick the due date so we know when it repeats.',
+                    style: text.bodySmall?.copyWith(color: colours.error),
+                  ),
+                ],
+
+                if (_canRepeat) ...[
+                  const SizedBox(height: AppTokens.space5),
+                  _RepeatsField(
+                    value: _repeat,
+                    dueDate: _dueDate,
+                    customDays: _customDays,
+                    days: _days,
+                    onChanged: (v) => setState(() {
+                      _repeat = v;
+                      if (v == null) _dueMissing = false;
+                    }),
+                  ),
+                ],
 
                 if (_error != null) ...[
                   const SizedBox(height: AppTokens.space4),
@@ -369,6 +463,90 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// "Repeats" select with a preview of the next two dates. "Custom" reveals
+/// an "Every N days" field.
+class _RepeatsField extends StatelessWidget {
+  const _RepeatsField({
+    required this.value,
+    required this.dueDate,
+    required this.customDays,
+    required this.days,
+    required this.onChanged,
+  });
+
+  final RepeatEvery? value;
+  final DateTime? dueDate;
+  final TextEditingController customDays;
+  final int days;
+  final ValueChanged<RepeatEvery?> onChanged;
+
+  bool get _isCustom => value == RepeatEvery.custom;
+
+  @override
+  Widget build(BuildContext context) {
+    String? preview;
+    final daysOk = !_isCustom || (days >= 1 && days <= maxCustomDays);
+    if (value != null && dueDate != null && daysOk) {
+      final next = nextDueDates(dueDate!, value!, dueDate!, 2, days: days);
+      final f = DateFormat('MMM d');
+      preview = 'Next: ${f.format(next[0])}, then ${f.format(next[1])}.';
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownButtonFormField<RepeatEvery?>(
+          initialValue: value,
+          isExpanded: true,
+          decoration: InputDecoration(
+            labelText: 'Repeats',
+            helperText: _isCustom ? null : preview,
+          ),
+          items: [
+            const DropdownMenuItem<RepeatEvery?>(
+              value: null,
+              child: Text("Doesn't repeat"),
+            ),
+            for (final e in RepeatEvery.values)
+              DropdownMenuItem<RepeatEvery?>(value: e, child: Text(e.label)),
+          ],
+          onChanged: onChanged,
+        ),
+        if (_isCustom) ...[
+          const SizedBox(height: AppTokens.space4),
+          TextFormField(
+            controller: customDays,
+            autofocus: customDays.text.isEmpty,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(3),
+            ],
+            decoration: InputDecoration(
+              labelText: 'Repeat every',
+              hintText: 'e.g. 21 or 30',
+              suffixIcon: Padding(
+                padding: const EdgeInsets.only(right: AppTokens.space4),
+                child: Text(days == 1 ? 'day' : 'days',
+                    style: Theme.of(context).textTheme.bodyLarge),
+              ),
+              suffixIconConstraints:
+                  const BoxConstraints(minWidth: 0, minHeight: 0),
+              helperText: preview,
+            ),
+            validator: (v) {
+              final n = int.tryParse(v?.trim() ?? '');
+              if (n == null || n < 1 || n > maxCustomDays) {
+                return 'Enter a number of days from 1 to $maxCustomDays.';
+              }
+              return null;
+            },
+          ),
+        ],
+      ],
     );
   }
 }

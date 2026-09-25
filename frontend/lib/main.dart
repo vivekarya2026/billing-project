@@ -16,6 +16,7 @@ import 'router.dart';
 import 'state/auth_state.dart' as app_auth;
 import 'state/current_user_state.dart';
 import 'state/settings_state.dart';
+import 'state/recurring_bills.dart';
 import 'shared/data/split_repository.dart';
 import 'shared/data/fake_split_repository.dart';
 import 'shared/data/bill_repository.dart';
@@ -91,6 +92,7 @@ Future<void> main() async {
   // Bill repository — always offline for now (Supabase bill tables deferred).
   // Swap to SupabaseBillRepository() once the live DB is connected.
   final BillRepository billRepo = FakeBillRepository();
+  await RecurringBills.instance.init(billRepo);
 
   // 6. Seed current user for offline/bypass mode
   final currentUserState = CurrentUserState.instance;
@@ -131,6 +133,8 @@ class BillApp extends StatelessWidget {
             value: CurrentUserState.instance),
         ChangeNotifierProvider<SettingsState>.value(
             value: SettingsState.instance),
+        ChangeNotifierProvider<RecurringBills>.value(
+            value: RecurringBills.instance),
         Provider<SplitRepository>.value(value: splitRepo),
         Provider<BillRepository>.value(value: billRepo),
       ],
@@ -145,6 +149,7 @@ class _BillMaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = buildRouter();
+    RecurringBills.instance.onOpenBill = (id) => router.push('/bill/$id');
     // Phones (< 400pt wide) get the tighter compact type scale; larger
     // screens keep the comfortable default. LayoutBuilder makes this
     // reactive to window resizes on web/desktop.

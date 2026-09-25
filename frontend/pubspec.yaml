@@ -46,6 +46,9 @@ dependencies:
   # Google Fonts (runtime fallback) — Inter is also bundled locally below.
   google_fonts: ^6.2.1
 
+  # Browser APIs — payment reminder notifications and calendar (.ics) download
+  web: ^1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -402,7 +402,7 @@ class FakeBillRepository implements BillRepository {
         : (v is String && v.isNotEmpty ? DateTime.tryParse(v) : null);
     return Bill(
       id: b.id,
-      accountId: b.accountId,
+      accountId: (e['account_id'] as String?) ?? b.accountId,
       provider: (e['provider'] as String?) ?? b.provider,
       serviceType: (e['service_type'] as String?) ?? b.serviceType,
       amountDue: e.containsKey('amount_due')
@@ -414,7 +414,7 @@ class FakeBillRepository implements BillRepository {
       extractionStatus: b.extractionStatus,
       narrationSentence:
           (e['narration_sentence'] as String?) ?? b.narrationSentence,
-      isPaid: b.isPaid,
+      isPaid: e.containsKey('is_paid') ? e['is_paid'] as bool : b.isPaid,
     );
   }
 
@@ -439,6 +439,7 @@ class FakeBillRepository implements BillRepository {
         extractionStatus: ub.extractionStatus,
         narrationSentence:
             _narrationOverrides[ub.id] ?? ub.narrationSentence,
+        isPaid: ub.isPaid,
         rawImagePath: null,
         extractionFields: const [],
         lineItems: const [],
@@ -463,6 +464,7 @@ class FakeBillRepository implements BillRepository {
       extractionStatus: bill.extractionStatus,
       narrationSentence:
           _narrationOverrides[bill.id] ?? bill.narrationSentence,
+      isPaid: bill.isPaid,
       rawImagePath: null,
       extractionFields: bill.id == _detailBillId
           ? _extractionFieldsFeb25 : [],

@@ -4,15 +4,15 @@
 //   [ month ]   [ colored ]   Provider name              $amount
 //   [  day  ]   [  tile   ]   subtitle (narration)      status label
 //
-// The colored category tile (CategoryTile) is shared with expense rows so
-// bills and expenses read identically.
+// The tile shows the company logo when one is known (ProviderLogo), and
+// otherwise the colored category tile shared with expense rows.
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../theme/accents.dart';
 import '../../theme/tokens.dart';
 import '../layout/responsive.dart';
-import 'category_icons.dart';
+import 'provider_logo.dart';
 
 class BillListRow extends StatelessWidget {
   const BillListRow({
@@ -97,11 +97,11 @@ class BillListRow extends StatelessWidget {
               ),
               SizedBox(width: gap),
 
-              // ── Colored category tile ────────────────────────────────
-              CategoryTile(
-                text: provider,
+              // ── Logo, or colored category tile ───────────────────────
+              ProviderLogo(
+                name: provider,
                 serviceType: serviceType,
-                dimension: tileSize,
+                size: tileSize,
               ),
               SizedBox(width: gap),
 
