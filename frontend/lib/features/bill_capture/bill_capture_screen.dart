@@ -15,6 +15,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, Uint8List;
 import 'package:go_router/go_router.dart';
+import '../../../shared/layout/go_back.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -230,7 +231,7 @@ class _BillCaptureScreenState extends State<BillCaptureScreen> {
         leading: IconButton(
           icon: const Icon(Icons.close),
           tooltip: 'Cancel',
-          onPressed: () => context.pop(),
+          onPressed: () => goBack(context, fallback: '/add-bill'),
         ),
       ),
       body: SafeArea(

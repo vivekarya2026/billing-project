@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../shared/layout/go_back.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/components/primary_button.dart';
@@ -241,7 +242,7 @@ class _BillDetailScreenState extends State<BillDetailScreen> {
     if (!mounted) return;
 
     // Leave the detail screen, then offer Undo on the list.
-    context.pop();
+    goBack(context);
     final messenger = ScaffoldMessenger.of(context);
     messenger.clearSnackBars();
     messenger.showSnackBar(
@@ -312,7 +313,7 @@ class _BillDetailBody extends StatelessWidget {
           pinned: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios),
-            onPressed: () => context.pop(),
+            onPressed: () => goBack(context),
           ),
           title: Text(bill.provider),
           actions: [

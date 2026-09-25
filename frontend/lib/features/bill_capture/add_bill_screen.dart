@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../shared/layout/go_back.dart';
 import '../../../theme/tokens.dart';
 
 class AddBillScreen extends StatelessWidget {
@@ -25,7 +26,7 @@ class AddBillScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.close),
           tooltip: 'Cancel',
-          onPressed: () => context.pop(),
+          onPressed: () => goBack(context),
         ),
       ),
       body: SafeArea(

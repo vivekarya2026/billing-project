@@ -22,6 +22,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../../shared/layout/go_back.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -301,7 +302,8 @@ class _ManualBillScreenState extends State<ManualBillScreen> {
         title: Text(_isEdit ? 'Edit bill' : 'Enter a bill'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => context.pop(),
+          onPressed: () => goBack(context,
+              fallback: _isEdit ? '/bill/${widget.billId}' : '/add-bill'),
         ),
       ),
       body: SafeArea(
